@@ -8,6 +8,8 @@ nucleotides = ['A', 'C', 'T', 'G']
 complementary_nucleotides = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
 
 # Generates a random DNA sequence with a specified length
+
+
 def randomDNA(length_of_DNA):
     randDNA = ""
     for i in range(length_of_DNA):
@@ -16,6 +18,8 @@ def randomDNA(length_of_DNA):
     return randDNA
 
 # Validates whether a sequence is a DNA sequence or not
+
+
 def validateDNA(dna):
     dna_seq = dna.upper()
     for i in dna_seq:
@@ -36,11 +40,15 @@ def countNucleotides(dna):
     return dict(collections.Counter(dna))    # Optimized way
 
 # Transcripts a given DNA sequence (gives the RNA version)
+
+
 def transcription(dna):
     transcribedSeq = dna.replace("T", "U")
     return transcribedSeq
 
 # Gives the complementary DNA sequence to a given DNA seq
+
+
 def complementary(dna):
     compSeq = ''
     if validateDNA != False:
@@ -49,7 +57,32 @@ def complementary(dna):
     return compSeq
 
 # Gives the reverse complementary DNA sequence to a given DNA seq
+
+
 def reverseComplementary(dna):
     reverseSeq = complementary(dna)
-    
+
     return reverseSeq[::-1]
+
+# Computes the GC content of a given DNA sequence
+
+
+def GC_Content(dna):
+    total_GC = dna.count('G') + dna.count('C')
+    GC_percentage = (total_GC / len(dna)) * 100
+    return GC_percentage
+
+
+# k = the number of nucleotides for each subsection
+def GC_Content_subsections(dna, k=5):
+    
+    subsections = []
+    for i in range(0, len(dna) - k + 1, k):
+        subsections.append(dna[i:i+k])
+    
+    for i in range(len(subsections)):
+        total_GC = subsections[i].count('G') + subsections[i].count('C')
+        GC_percentage = 100 * (total_GC / len(subsections[i]))
+        result = print(f"Subsection: {subsections[i]} - GC Content: {GC_percentage}")
+
+    return result

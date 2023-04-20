@@ -29,3 +29,6 @@ def countNucleotides(dna):
     
     return dict(collections.Counter(dna))    # Optimized way 
 
+def transcription(dna):
+    transcribedSeq = dna.replace("T", "U")
+    return transcribedSeq

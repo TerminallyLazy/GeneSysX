@@ -17,13 +17,14 @@ with open('rosalind_prot.txt', 'r') as file:
     print(contents)
 
 def translation(dna):
-    
     # Loops through the DNA sequence and separated them into codons
     separated_codons = []
     for i in range(0, len(dna), 3):
         codon = dna[i:i+3]
         separated_codons.append(codon)
 
+    # remove the last element from separated_codons
+    separated_codons.pop()
     # print(separated_codons)
 
     # Loops through the dictionary to find the AA for a given codon
@@ -33,5 +34,8 @@ def translation(dna):
         # print(AA)
         AA_seq += AA
     print(AA_seq)
+
+
+
 
 translation(contents)

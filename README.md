@@ -21,6 +21,9 @@ Link to the problems:
 ## Completed:
 - GC Content: Computes the GC content of a given strand.
     - Solved the Rosalind problem code that finds the maximum GC content of a given FASTA file
+- Translation: Given a DNA sequence, translate it into it's respective AA sequence
 
 Link to the problems: 
 - https://rosalind.info/problems/gc/
+- https://rosalind.info/problems/prot/
+

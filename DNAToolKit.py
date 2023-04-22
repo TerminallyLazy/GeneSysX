@@ -103,3 +103,4 @@ def GC_Content_combined(dna, k=None):
             result = print(f"Subsection: {subsections[i]} - GC Content: {GC_percentage}")
 
     return result
+

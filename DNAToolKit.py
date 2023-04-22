@@ -66,19 +66,19 @@ def reverseComplementary(dna):
 
 # Computes the GC content of a given DNA sequence
 
-#def GC_Content(dna):
+# def GC_Content(dna):
 #    total_GC = dna.count('G') + dna.count('C')
 #    GC_percentage = (total_GC / len(dna)) * 100
 #    return GC_percentage
 
 
 # k = the number of nucleotides for each subsection
-#def GC_Content_subsections(dna, k=5):
-    
+# def GC_Content_subsections(dna, k=5):
+
 #    subsections = []
 #    for i in range(0, len(dna) - k + 1, k):
 #        subsections.append(dna[i:i+k])
-    
+
 #    for i in range(len(subsections)):
 #        total_GC = subsections[i].count('G') + subsections[i].count('C')
 #        GC_percentage = 100 * (total_GC / len(subsections[i]))
@@ -100,7 +100,7 @@ def GC_Content_combined(dna, k=None):
         for i in range(len(subsections)):
             total_GC = subsections[i].count('G') + subsections[i].count('C')
             GC_percentage = 100 * (total_GC / len(subsections[i]))
-            result = print(f"Subsection: {subsections[i]} - GC Content: {GC_percentage}")
+            result = print(
+                f"Subsection: {subsections[i]} - GC Content: {GC_percentage}")
 
     return result
-

@@ -16,3 +16,11 @@ Link to the problems:
 - https://rosalind.info/problems/revc/
 - https://rosalind.info/problems/gc/
 
+
+# Day 2: Busy Day
+## Completed:
+- GC Content: Computes the GC content of a given strand.
+    - Solved the Rosalind problem code that finds the maximum GC content of a given FASTA file
+
+Link to the problems: 
+- https://rosalind.info/problems/gc/

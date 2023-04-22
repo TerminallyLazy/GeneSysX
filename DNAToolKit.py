@@ -130,9 +130,12 @@ def translation(dna):
     # print(separated_codons)
 
     # Loops through the dictionary to find the AA for a given codon
+    AA_seq = ""
     for codon in separated_codons:
         AA = codon_table[codon]
-        print(AA)
+        # print(AA)
+        AA_seq += AA
+    print(AA_seq)
 
 
 translation("AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA")

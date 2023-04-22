@@ -16,6 +16,7 @@ with open('rosalind_prot.txt', 'r') as file:
     contents = file.read()
     print(contents)
 
+
 def translation(dna):
     # Loops through the DNA sequence and separated them into codons
     separated_codons = []
@@ -34,8 +35,6 @@ def translation(dna):
         # print(AA)
         AA_seq += AA
     print(AA_seq)
-
-
 
 
 translation(contents)

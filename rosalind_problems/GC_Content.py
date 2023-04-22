@@ -7,8 +7,6 @@ with open('rosalind_gc.txt', 'r') as file:
     contents = file.read()
     cleaned_data = contents.replace(">", "")
     
-print(cleaned_data)
-
 sequences = {}
 lines = cleaned_data.split("\n")
 i = 0

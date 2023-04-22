@@ -23,6 +23,7 @@ codon_table = {
 
 # Generates a random DNA sequence with a specified length
 
+
 def randomDNA(length_of_DNA):
     randDNA = ""
     for i in range(length_of_DNA):
@@ -118,6 +119,7 @@ def GC_Content_combined(dna, k=None):
 
     return result
 
+
 def translation(dna):
     # Loops through the DNA sequence and separated them into codons
     separated_codons = []
@@ -126,10 +128,11 @@ def translation(dna):
         separated_codons.append(codon)
 
     # print(separated_codons)
-    
+
     # Loops through the dictionary to find the AA for a given codon
     for codon in separated_codons:
         AA = codon_table[codon]
         print(AA)
+
 
 translation("AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA")

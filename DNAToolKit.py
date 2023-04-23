@@ -178,5 +178,16 @@ def hamming_distance(dna1, dna2):
 
     return hammingDist
 
+def open_reading_frames(dna):
+    seq1 = dna
+    seq2 = dna[1:]
+    seq3 = dna[2:]
 
-print(hamming_distance("GAGCCTACTAACGGGAT", "CATCGTAATGACGGCCT"))
+    frame1 = translation(seq1)
+    frame2 = translation(seq2)
+    frame3 = translation(seq3)
+
+    return frame1, frame2, frame3
+
+
+print(open_reading_frames(transcription("AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG")))

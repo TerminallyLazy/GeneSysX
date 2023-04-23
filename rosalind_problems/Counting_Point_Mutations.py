@@ -5,3 +5,4 @@ def hamming_distance(dna1, dna2):
             hammingDist += 1
 
     return hammingDist
+

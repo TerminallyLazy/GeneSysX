@@ -27,3 +27,13 @@ Link to the problems:
 - https://rosalind.info/problems/gc/
 - https://rosalind.info/problems/prot/
 
+
+# Day 3: Becoming more Algorithm based Problems
+ ## Completed
+ - Calculate the Protein Mass of a given protein sequence
+ - Calculating Point Mutations: Wrote a function that calculates the hamming distance between two DNA sequences
+
+ Link to the problems:
+- https://rosalind.info/problems/prtm/
+    - https://rosalind.info/glossary/monoisotopic-mass-table/
+- https://rosalind.info/problems/hamm/

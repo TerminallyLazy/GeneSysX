@@ -21,6 +21,27 @@ codon_table = {
     "GGU": "G", "GGC": "G", "GGA": "G", "GGG": "G"
 }
 
+aa_protein_mass = {'A': 71.03711,
+                   'C': 103.00919,
+                   'D': 115.02694,
+                   'E': 129.04259,
+                   'F': 147.06841,
+                   'G': 57.02146,
+                   'H': 137.05891,
+                   'I': 113.08406,
+                   'K': 128.09496,
+                   'L': 113.08406,
+                   'M': 131.04049,
+                   'N': 114.04293,
+                   'P': 97.05276,
+                   'Q': 128.05858,
+                   'R': 156.10111,
+                   'S': 87.03203,
+                   'T': 101.04768,
+                   'V': 99.06841,
+                   'W': 186.07931,
+                   'Y': 163.06333}
+
 # Generates a random DNA sequence with a specified length
 
 
@@ -101,6 +122,7 @@ def reverseComplementary(dna):
 #    return result
 
 # The combined above two functions into one GC content calculator
+
 def GC_Content_combined(dna, k=None):
     if k is None:
         total_GC = dna.count('G') + dna.count('C')
@@ -135,7 +157,26 @@ def translation(dna):
         AA = codon_table[codon]
         # print(AA)
         AA_seq += AA
-    print(AA_seq)
+    return AA_seq
 
 
-translation("AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA")
+def protein_mass(dna):
+    translated_seq = translation(dna)
+    print(translated_seq)
+    prot_mass = 0
+    for i in range(len(translated_seq)):
+        prot_mass += aa_protein_mass[translated_seq[i]]
+
+    return prot_mass
+
+
+def hamming_distance(dna1, dna2):
+    hammingDist = 0
+    for i in range(len(dna1)):
+        if dna1[i] != dna2[i]:
+            hammingDist += 1
+
+    return hammingDist
+
+
+print(hamming_distance("GAGCCTACTAACGGGAT", "CATCGTAATGACGGCCT"))

@@ -209,11 +209,10 @@ def open_reading_frames(dna):
 
 
 
-dna = "ATG"
 
 # Generate a random DNA sequence
-random_sequence = randomDNA(10)
-print("Random DNA Sequence:", random_sequence)
+dna = randomDNA(6)
+print("Random DNA Sequence:", dna)
 
 # Validate whether the sequence is DNA
 validated_dna = validateDNA(dna)
@@ -248,7 +247,7 @@ protein_mass_value = protein_mass(translated_sequence)
 print("Protein Mass:", protein_mass_value)
 
 # Calculate the Hamming distance between two DNA sequences
-dna2 = "ATGCGGCGTGACUGA"  # A different DNA sequence for comparison
+dna2 = "ATGCGGCGTGACUGA"
 hamming_dist = hamming_distance(dna, dna2)
 print("Hamming Distance:", hamming_dist)
 

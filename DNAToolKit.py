@@ -84,12 +84,22 @@ def transcription(dna):
 # Gives the complementary DNA sequence to a given DNA seq
 
 
-def complementary(dna):
+def complementary(rna):
     compSeq = ''
-    if validateDNA != False:
-        for i in dna:
-            compSeq += complementary_nucleotides[i]
+    for i in rna:
+        if i == 'A':
+            compSeq += 'T'
+        elif i == 'U':
+            compSeq += 'A'
+        elif i == 'C':
+            compSeq += 'G'
+        elif i == 'G':
+            compSeq += 'C'
+        else:
+            # Handle other characters (e.g., non-nucleotide characters) as-is
+            compSeq += i
     return compSeq
+
 
 # Gives the reverse complementary DNA sequence to a given DNA seq
 
@@ -143,31 +153,39 @@ def GC_Content_combined(dna, k=None):
 
 
 def translation(dna):
-    # Loops through the DNA sequence and separated them into codons
-    separated_codons = []
-    for i in range(0, len(dna), 3):
+    # Check if the input sequence is not empty
+    if len(dna) == 0:
+        return ""
+
+    # Initialize the translated sequence with an empty string
+    translated_seq = ""
+
+    # Iterate through the DNA sequence in codons (3 nucleotides at a time)
+    for i in range(0, len(dna) - 2, 3):
         codon = dna[i:i+3]
-        separated_codons.append(codon)
 
-    # print(separated_codons)
+        # Check if the codon is in the codon table
+        if codon in codon_table:
+            amino_acid = codon_table[codon]
+            translated_seq += amino_acid
+        else:
+            # If the codon is not in the table, add a placeholder
+            translated_seq += '?'
 
-    # Loops through the dictionary to find the AA for a given codon
-    AA_seq = ""
-    for codon in separated_codons:
-        AA = codon_table[codon]
-        # print(AA)
-        AA_seq += AA
-    return AA_seq
+    return translated_seq
 
 
 def protein_mass(dna):
-    translated_seq = translation(dna)
-    print(translated_seq)
+    
     prot_mass = 0
-    for i in range(len(translated_seq)):
-        prot_mass += aa_protein_mass[translated_seq[i]]
-
+    for aa in dna:
+        if aa in aa_protein_mass:
+            prot_mass += aa_protein_mass[aa]
+        else:
+            print(f"Warning: Unknown amino acid '{aa}' encountered.")
+    
     return prot_mass
+
 
 
 def hamming_distance(dna1, dna2):
@@ -190,4 +208,50 @@ def open_reading_frames(dna):
     return frame1, frame2, frame3
 
 
-print(open_reading_frames(transcription("AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG")))
+
+dna = "ATG"
+
+# Generate a random DNA sequence
+random_sequence = randomDNA(10)
+print("Random DNA Sequence:", random_sequence)
+
+# Validate whether the sequence is DNA
+validated_dna = validateDNA(dna)
+print("Validated DNA Sequence:", validated_dna)
+
+# Count the number of each nucleotide in the DNA sequence
+nucleotide_count = countNucleotides(dna)
+print("Nucleotide Count:", nucleotide_count)
+
+# Transcribe the DNA sequence
+transcribed_dna = transcription(dna)
+print("Transcribed DNA Sequence:", transcribed_dna)
+
+# Find the complementary DNA sequence
+complementary_dna = complementary(transcribed_dna)
+print("Complementary DNA Sequence:", complementary_dna)
+
+# Find the reverse complementary DNA sequence
+reverse_complementary_dna = reverseComplementary(dna)
+print("Reverse Complementary DNA Sequence:", reverse_complementary_dna)
+
+# Calculate the GC content
+gc_content = GC_Content_combined(dna)
+print("GC Content:", gc_content)
+
+# Translate the DNA sequence
+translated_sequence = translation(transcribed_dna)
+print("Translated Sequence:", translated_sequence)
+
+# Calculate the protein mass
+protein_mass_value = protein_mass(translated_sequence)
+print("Protein Mass:", protein_mass_value)
+
+# Calculate the Hamming distance between two DNA sequences
+dna2 = "ATGCGGCGTGACUGA"  # A different DNA sequence for comparison
+hamming_dist = hamming_distance(dna, dna2)
+print("Hamming Distance:", hamming_dist)
+
+# Find open reading frames
+orf_frames = open_reading_frames(dna)
+print("Open Reading Frames:", orf_frames)

@@ -37,3 +37,21 @@ Link to the problems:
 - https://rosalind.info/problems/prtm/
     - https://rosalind.info/glossary/monoisotopic-mass-table/
 - https://rosalind.info/problems/hamm/
+
+
+# We back:
+
+Output:
+
+Random DNA Sequence: AACGAA
+Validated DNA Sequence: AACGAA
+Nucleotide Count: {'A': 4, 'C': 1, 'G': 1}
+Transcribed DNA Sequence: AACGAA
+Complementary DNA Sequence: TTGCTT
+Reverse Complementary DNA Sequence: TTCGTT
+GC Content: 33.33333333333333
+GC Content: None
+Translated Sequence: NE
+Protein Mass: 243.08551999999997
+Hamming Distance: 5
+Open Reading Frames: ('NE', 'T', 'R')

@@ -1,4 +1,3 @@
-# Import necessary modules
 import random
 import collections
 

@@ -6,13 +6,7 @@ from API_SECRETS import OPEN_API_KEY
 
 openai.api_key = OPEN_API_KEY
 
-fasta_file = "sequence.fasta"
-sequences_as_string = fasta_to_string(fasta_file)
-
-
-user_input = input("Hi! Enter your request: ")
-
-def run_conversation():
+def run_conversation(user_input, sequences_as_string):
     # Step 1: Send the user query and available functions to GPT-3.5 Turbo
     messages = [{"role": "user", "content": f"Take the user's request {user_input} and perform the respective actions to the following the DNA sequence: {sequences_as_string}"}]
     
@@ -97,6 +91,3 @@ def run_conversation():
         answer = second_response["choices"][0]["message"]["content"]
 
         return answer
-
-# Run the conversation and get the response
-print(run_conversation())

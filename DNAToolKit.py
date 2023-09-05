@@ -1,5 +1,6 @@
 import random
 import collections
+import json
 
 # Counting DNA Nucleotides
 
@@ -56,34 +57,37 @@ def randomDNA(length_of_DNA):
 
 def validateDNA(dna):
     dna_seq = dna.upper()
-    for i in dna_seq:
-        if i not in nucleotides:
+    replaced_seq = ""
+
+    for nucleotide in dna_seq:
+        if nucleotide == 'N':
+            # Replace 'N' with a random nucleotide
+            random_nucleotide = random.choice(nucleotides)
+            replaced_seq += random_nucleotide
+        elif nucleotide not in nucleotides:
             return False
-    return dna_seq
+        else:
+            replaced_seq += nucleotide
+
+    return replaced_seq
 
 
 # Count the number of each nucleotide in a given DNA sequence
 def countNucleotides(dna):
-    # nucleotides = {"A": 0, "T": 0, "C": 0, "G": 0}
-    # for base in dna:
-    #    if base in nucleotides:
-    #        nucleotides[base] += 1
-    # count_strs = [f"{n}: {c}" for n, c in nucleotides.items()]
-    # return ", ".join(count_strs)
-
-    return dict(collections.Counter(dna))    # Optimized way
-
-# Transcripts a given DNA sequence (gives the RNA version)
-
-
-def transcription(dna):
-    transcribedSeq = dna.replace("T", "U")
-    return transcribedSeq
+    count_dict = dict(collections.Counter(dna))
+    count_json = json.dumps(count_dict)
+    return count_json
 
 # Gives the complementary DNA sequence to a given DNA seq
 
+def transcription(rna):
+    transcribedSeq = rna.replace("T", "U")
+    return transcribedSeq
 
+
+# Transcripts a given DNA sequence (gives the RNA version)
 def complementary(rna):
+    rna = rna.replace("T", "U")
     compSeq = ''
     for i in rna:
         if i == 'A':
@@ -95,40 +99,15 @@ def complementary(rna):
         elif i == 'G':
             compSeq += 'C'
         else:
-            # Handle other characters (e.g., non-nucleotide characters) as-is
             compSeq += i
+    
     return compSeq
 
-
-# Gives the reverse complementary DNA sequence to a given DNA seq
-
-
+# Gives the reverse complementary DNA sequence to a given DNA seq   
 def reverseComplementary(dna):
     reverseSeq = complementary(dna)
 
     return reverseSeq[::-1]
-
-# Computes the GC content of a given DNA sequence
-
-# def GC_Content(dna):
-#    total_GC = dna.count('G') + dna.count('C')
-#    GC_percentage = (total_GC / len(dna)) * 100
-#    return GC_percentage
-
-
-# k = the number of nucleotides for each subsection
-# def GC_Content_subsections(dna, k=5):
-
-#    subsections = []
-#    for i in range(0, len(dna) - k + 1, k):
-#        subsections.append(dna[i:i+k])
-
-#    for i in range(len(subsections)):
-#        total_GC = subsections[i].count('G') + subsections[i].count('C')
-#        GC_percentage = 100 * (total_GC / len(subsections[i]))
-#        result = print(f"Subsection: {subsections[i]} - GC Content: {GC_percentage}")
-
-#    return result
 
 # The combined above two functions into one GC content calculator
 
@@ -152,26 +131,30 @@ def GC_Content_combined(dna, k=None):
 
 
 def translation(dna):
-    # Check if the input sequence is not empty
+
+    dna = transcription(dna)
+
     if len(dna) == 0:
         return ""
-
-    # Initialize the translated sequence with an empty string
+    
     translated_seq = ""
 
-    # Iterate through the DNA sequence in codons (3 nucleotides at a time)
     for i in range(0, len(dna) - 2, 3):
         codon = dna[i:i+3]
 
-        # Check if the codon is in the codon table
         if codon in codon_table:
             amino_acid = codon_table[codon]
-            translated_seq += amino_acid
+            
+            # Check if the amino acid is a stop codon
+            if amino_acid == "*":
+                break 
+            else:
+                translated_seq += amino_acid
         else:
-            # If the codon is not in the table, add a placeholder
             translated_seq += '?'
 
     return translated_seq
+
 
 
 def protein_mass(dna):
@@ -188,12 +171,16 @@ def protein_mass(dna):
 
 
 def hamming_distance(dna1, dna2):
+    if len(dna1) != len(dna2):
+        raise ValueError("Input sequences must have the same length")
+
     hammingDist = 0
     for i in range(len(dna1)):
         if dna1[i] != dna2[i]:
             hammingDist += 1
 
     return hammingDist
+
 
 def open_reading_frames(dna):
     seq1 = dna
@@ -208,48 +195,6 @@ def open_reading_frames(dna):
 
 
 
+dna = "GGCCTAACTCTCTGAAACGATGAATTACACAAGTTTTATTTTCGCTTTTCAGCTTTGCATAATTTTGTGTTCTTCTGGTTGTTACTGTCAGGCCATGTTTTTTAAAGAAATAGAAGAGCTAAAGGGATATTTTAATGCAAGTAATCCAGATGTAGCAGATGGTGGGTCGCTTTTCGTAGACATTTCAAAGAACTGGAAAGAGGAGAGTGATAAAACAATAATTCAAAGCCAAATTGTCTCCTTCTACTTGAAAATGTTTGAAAACCTGAAAGATGATGACCAGCGCATTCAAAGGAACATGGACACCATCAAGGAAGACATGCTTGATAAGTTGTTAAATACCAGCTCCAGTAAACGGGATGACTTCCTCAAGCTGATTCAAATCCCTGTGAATGATCTGCAGGTCCAGCGCAAAGCAATAAATGAACTCTTCAAAGTGATGAACGATCTCTCACCAAGATCTAACCTGAGGAAGCGGAAAAGGAGTCAGAATCTGTTTCGAGGCCGTAGAGCATCGAAATAATGGTCGTCCTGCCTGCAATATTTG"
 
-# Generate a random DNA sequence
-dna = randomDNA(6)
-print("Random DNA Sequence:", dna)
-
-# Validate whether the sequence is DNA
-validated_dna = validateDNA(dna)
-print("Validated DNA Sequence:", validated_dna)
-
-# Count the number of each nucleotide in the DNA sequence
-nucleotide_count = countNucleotides(dna)
-print("Nucleotide Count:", nucleotide_count)
-
-# Transcribe the DNA sequence
-transcribed_dna = transcription(dna)
-print("Transcribed DNA Sequence:", transcribed_dna)
-
-# Find the complementary DNA sequence
-complementary_dna = complementary(transcribed_dna)
-print("Complementary DNA Sequence:", complementary_dna)
-
-# Find the reverse complementary DNA sequence
-reverse_complementary_dna = reverseComplementary(dna)
-print("Reverse Complementary DNA Sequence:", reverse_complementary_dna)
-
-# Calculate the GC content
-gc_content = GC_Content_combined(dna)
-print("GC Content:", gc_content)
-
-# Translate the DNA sequence
-translated_sequence = translation(transcribed_dna)
-print("Translated Sequence:", translated_sequence)
-
-# Calculate the protein mass
-protein_mass_value = protein_mass(translated_sequence)
-print("Protein Mass:", protein_mass_value)
-
-# Calculate the Hamming distance between two DNA sequences
-dna2 = "ATGCGGCGTGACUGA"
-hamming_dist = hamming_distance(dna, dna2)
-print("Hamming Distance:", hamming_dist)
-
-# Find open reading frames
-orf_frames = open_reading_frames(dna)
-print("Open Reading Frames:", orf_frames)
+print(countNucleotides(dna))

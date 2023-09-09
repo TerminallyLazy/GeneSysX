@@ -1,6 +1,6 @@
 import openai
 import json
-from DNAToolKit import transcription, countNucleotides
+from DNAToolKit import *
 from fasta_2_string import fasta_to_string
 from API_SECRETS import OPEN_API_KEY
 
@@ -31,14 +31,98 @@ def run_conversation(user_input, sequences_as_string):
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "rna": {
+                    "dna": {
                         "type": "string",
-                        "description": "The RNA sequence to transcribe",
+                        "description": "The DNA sequence to transcribe",
                     },
                 },
-                "required": ["rna"],
+                "required": ["dna"],
             },
+        },
+        {
+            "name": "translation",
+            "description": "Translates the sequence to it's protein sequence",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "dna": {
+                        "type": "string",
+                        "description": "The sequence to be translated",
+                    },
+                },
+                "required": ["dna"],
+            },
+        },
+        {
+            "name": "restriction_sites",
+            "description": "Finds the restriction sites of a given DNA seq",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "dna": {
+                        "type": "string",
+                        "description": "The DNA sequence to look at",
+                    },
+                },
+                "required": ["dna"],
+            },
+            "returns": {
+                "type": "string",
+                "description": "A string containing the restriction sites found in the DNA sequence.",
+            }
+        },
+        {
+            "name": "protein_mass",
+            "description": "Calculates the protein mass from the protein sequence",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "dna": {
+                        "type": "string",
+                        "description": "The DNA sequence to look at",
+                    },
+                },
+                "required": ["dna"],
+            },
+            "returns": {
+                "type": "string",
+                "description": "The protein mass found in the DNA sequence.",
+            }
+        },
+        {
+            "name": "open_reading_frames",
+            "description": "Calculates the open reading frames (ORFs) from a given DNA sequence and translates them into protein sequences.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "dna": {
+                        "type": "string",
+                        "description": "The DNA sequence to analyze for open reading frames (ORFs).",
+                    }
+                },
+                "required": ["dna"]
+            },
+            "returns": {
+                "type": "object",
+                "description": "An object containing the translated protein sequences derived from the identified open reading frames (ORFs).",
+                "properties": {
+                    "frame1": {
+                        "type": "string",
+                        "description": "The protein sequence translated from the first reading frame.",
+                    },
+                    "frame2": {
+                        "type": "string",
+                        "description": "The protein sequence translated from the second reading frame.",
+                    },
+                    "frame3": {
+                        "type": "string",
+                        "description": "The protein sequence translated from the third reading frame.",
+                    }
+                }
+            }
         }
+
+
     ]
 
     response = openai.ChatCompletion.create(
@@ -55,22 +139,50 @@ def run_conversation(user_input, sequences_as_string):
         # Step 3: Call the function based on the model's response
         available_functions = {
             "transcription": transcription,
-            "countNucleotides": countNucleotides
+            "countNucleotides": countNucleotides,
+            "restriction_sites": restriction_sites,
+            "translation": translation,
+            "protein_mass": protein_mass,
+            "open_reading_frames": open_reading_frames
         }
         
         function_name = response_message["function_call"]["name"]
         function_to_call = available_functions.get(function_name)
 
         if function_to_call is not None:
-            function_args = json.loads(response_message["function_call"]["arguments"])
-            if function_name == "countNucleotides":
-                function_response = function_to_call(
-                    dna=function_args.get("dna"),
-                )
-            else:
-                function_response = function_to_call(
-                    rna=function_args.get("rna"),
+            try:
+                function_args = json.loads(response_message["function_call"]["arguments"])
+                if function_name == "countNucleotides":
+                    function_response = function_to_call(
+                        dna=function_args.get("dna"),
                     )
+                elif function_name == "transcription":
+                    function_response = function_to_call(
+                        dna=function_args.get("dna"),
+                    )
+                elif function_name == "restriction_sites":
+                    function_response = function_to_call(
+                        dna=function_args.get("dna"),
+                    )
+                elif function_name == "translation":
+                    function_response = function_to_call(
+                        dna=function_args.get("dna")
+                    )
+                elif function_name == "protein_mass":
+                    function_response = function_to_call(
+                        dna=function_args.get("dna")
+                    )
+                elif function_name == "open_reading_frames":
+                    function_response = function_to_call(
+                        dna=function_args.get("dna")
+                    )
+                else:
+                    function_response = function_to_call(
+                        dna=function_args.get("dna"),
+                    )
+
+            except json.JSONDecodeError:
+                function_response = "An error occurred while decoding the function arguments."
 
         # Step 4: Extend the conversation with the function call and response
         messages.append(response_message)  # Extend conversation with assistant's reply

@@ -20,8 +20,8 @@ DecodeAI is a cutting-edge artificial intelligence platform that offers a wide r
         - [ ] BLAST2Seq
     - [ ] Gene Ontology enrichment analysis ?
     - [ ] Allow users to edit the gene sequence
-
-### Long Term Implementations:
+    
+    ### Long Term Implementations:
     - [ ] Predict the pathogenicity of genetic variants associated with diseases
     - [ ] Help users identify potential off-target sites for CRISPR-Cas9 genome editing
     - [ ] Automatically annotate genetic variants with functional consequences

@@ -18,7 +18,45 @@ SNP detection: Detects Single Nucleotide Polymorphisms (SNPs) in DNA sequences.
 Primer Design Automation: Automates the design of primers for PCR experiments.
 BLAST searches: Implements various BLAST algorithms for sequence similarity searches.
 
-##
+## General Data (.csv, .pdf, tabulated data, etc):
+
+- [ ] Display the dataframe
+- [ ] Create and edit dataframes
+    - [ ] Creating new columns
+    - [ ] Deleting columns
+    - [ ] Creating new rows
+    - [ ] Deleting rows
+    - [ ] Renaming columns
+    - [ ] Renaming rows
+    - [ ] Merging Dataframes: Implement dataframe merging or joining operations (e.g., inner, outer, left, right joins).
+    - [ ] Sorting Dataframes: Allow users to sort dataframes based on one or more columns.
+    - [ ] Aggregating Data: Provide functions for data aggregation and group-by operations.
+    - [ ] Pivot Tables: Support the creation of pivot tables for summarizing and reshaping data.
+    - [ ] Filtering Data: Enable users to filter data based on specific conditions or criteria.
+    - [ ] Data Transposition: Allow users to transpose dataframes (rows become columns, and vice versa).
+    - [ ] Data Type Conversion: Support conversion between different data types for dataframe columns.
+    - [ ] Data Validation: Implement data validation checks to ensure data integrity.
+    - [ ] Data Sampling: Allow users to randomly sample data from dataframes.
+- [ ] Data Visualization
+    - [ ] Implement data visualization tools for exploring and visualizing datasets.
+    - [ ] Generate interactive charts and plots.
+- [ ] Statistical Analysis
+    - [ ] Provide statistical analysis functions for data summary and hypothesis testing.
+    - [ ] Calculate descriptive statistics (mean, median, standard deviation, etc.).
+- [ ] Export and Import
+    - [ ] Enable data export in various formats (CSV, Excel, JSON, etc.).
+    - [ ] Support data import from external sources and formats.
+
+### Long Term Implementations:
+- [ ] Machine Learning Integration
+    - [ ] Incorporate machine learning algorithms for predictive modeling and classification.
+    - [ ] Allow users to train and evaluate machine learning models on their data.
+- [ ] Data Cleaning
+    - [ ] Implement data cleaning and preprocessing functions (e.g., handling missing values, outliers).
+    - [ ] Offer data imputation techniques.
+- [ ] Time Series Analysis
+    - [ ] Provide tools for time series data analysis, including trend analysis and forecasting.
+    - [ ] Implement time series decomposition and visualization.
 
 
 ## Genomic Processing
@@ -49,3 +87,4 @@ BLAST searches: Implements various BLAST algorithms for sequence similarity sear
     - [ ] Allow users to perform molecular docking simulations for predicting how small molecules interact with proteins
     - [ ] Protein-Protein Interaction Prediction: Implement algorithms to predict protein-protein interactions based on protein sequences or structures
     - [ ] Support analysis of RNA-Seq data, including differential gene expression analysis and transcript quantification
+

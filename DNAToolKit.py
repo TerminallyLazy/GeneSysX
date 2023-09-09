@@ -80,16 +80,16 @@ def countNucleotides(dna):
 
 # Gives the complementary DNA sequence to a given DNA seq
 
-def transcription(rna):
-    transcribedSeq = rna.replace("T", "U")
+def transcription(dna):
+    transcribedSeq = dna.replace("T", "U")
     return transcribedSeq
 
 
 # Transcripts a given DNA sequence (gives the RNA version)
-def complementary(rna):
-    rna = rna.replace("T", "U")
+def complementary(dna):
+    dna = dna.replace("T", "U")
     compSeq = ''
-    for i in rna:
+    for i in dna:
         if i == 'A':
             compSeq += 'T'
         elif i == 'U':
@@ -104,6 +104,7 @@ def complementary(rna):
     return compSeq
 
 # Gives the reverse complementary DNA sequence to a given DNA seq   
+
 def reverseComplementary(dna):
     reverseSeq = complementary(dna)
 
@@ -166,7 +167,7 @@ def protein_mass(dna):
         else:
             print(f"Warning: Unknown amino acid '{aa}' encountered.")
     
-    return prot_mass
+    return str(prot_mass)
 
 
 
@@ -191,10 +192,27 @@ def open_reading_frames(dna):
     frame2 = translation(seq2)
     frame3 = translation(seq3)
 
-    return frame1, frame2, frame3
+    # Concatenate the protein sequences into a single string
+    combined_frames = frame1 + frame2 + frame3
+
+    return combined_frames
 
 
+def restriction_sites(dna):
+    reverse_palindromes = []
+    
+    for length in range(4, 13):
+        for i in range(len(dna) - length + 1):
+            subsequence = dna[i:i+length]
+            complement = reverseComplementary(subsequence)
+            
+            if subsequence == complement:
+                reverse_palindromes.append(subsequence)
 
-#dna = "GGCCTAACTCTCTGAAACGATGAATTACACAAGTTTTATTTTCGCTTTTCAGCTTTGCATAATTTTGTGTTCTTCTGGTTGTTACTGTCAGGCCATGTTTTTTAAAGAAATAGAAGAGCTAAAGGGATATTTTAATGCAAGTAATCCAGATGTAGCAGATGGTGGGTCGCTTTTCGTAGACATTTCAAAGAACTGGAAAGAGGAGAGTGATAAAACAATAATTCAAAGCCAAATTGTCTCCTTCTACTTGAAAATGTTTGAAAACCTGAAAGATGATGACCAGCGCATTCAAAGGAACATGGACACCATCAAGGAAGACATGCTTGATAAGTTGTTAAATACCAGCTCCAGTAAACGGGATGACTTCCTCAAGCTGATTCAAATCCCTGTGAATGATCTGCAGGTCCAGCGCAAAGCAATAAATGAACTCTTCAAAGTGATGAACGATCTCTCACCAAGATCTAACCTGAGGAAGCGGAAAAGGAGTCAGAATCTGTTTCGAGGCCGTAGAGCATCGAAATAATGGTCGTCCTGCCTGCAATATTTG"
+    reverse_palindromes_str = ', '.join(reverse_palindromes)
+    
+    return reverse_palindromes_str
 
-#print(transcription(dna))
+dna = "AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG"
+
+print(open_reading_frames(dna))

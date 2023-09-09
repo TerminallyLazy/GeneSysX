@@ -22,8 +22,8 @@ BLAST searches: Implements various BLAST algorithms for sequence similarity sear
 
 
 ## Genomic Processing
-- [ ] Implement function calling to call functions from DNA Tool Kit
-    - [ ] Implement restriction site detection
+- [x] Implement function calling to call functions from DNA Tool Kit
+    - [x] Implement restriction site detection
         - [ ] Further it by suggesting respective restriction enzymes
     - [ ] Implement Multiple Sequence Alignment
     - [ ] Generate phylogenetic trees from MSA

@@ -61,6 +61,14 @@ BLAST searches: Implements various BLAST algorithms for sequence similarity sear
 
 ## Genomic Processing
 - [x] Implement function calling to call functions from DNA Tool Kit
+    - [x] Compute the complementary DNA sequence of a given DNA sequence
+    - [x] Implement mRNA transcription
+    - [x] Implement mRNA to protein translation
+    - [x] Count and return the number of nucleotides
+    - [x] Calculate the GC content of a DNA sequence and also calculate the GC content in subsections of the sequence if k is specified
+    - [x] Calculate the total mass of a protein sequence based on amino acid masses
+    - [x] Compute the Hamming distance between two DNA sequences of the same length
+    - [x] Identifiy open reading frames (ORFs) in a DNA sequence and translate them into protein sequences 
     - [x] Implement restriction site detection
         - [ ] Further it by suggesting respective restriction enzymes
     - [ ] Implement Multiple Sequence Alignment

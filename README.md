@@ -95,4 +95,5 @@ BLAST searches: Implements various BLAST algorithms for sequence similarity sear
     - [ ] Allow users to perform molecular docking simulations for predicting how small molecules interact with proteins
     - [ ] Protein-Protein Interaction Prediction: Implement algorithms to predict protein-protein interactions based on protein sequences or structures
     - [ ] Support analysis of RNA-Seq data, including differential gene expression analysis and transcript quantification
+    - [ ] More storage efficient data structures for nucleotide data solution.
 

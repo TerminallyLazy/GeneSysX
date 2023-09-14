@@ -20,7 +20,7 @@ BLAST searches: Implements various BLAST algorithms for sequence similarity sear
 
 ## General Data (.csv, .pdf, tabulated data, etc):
 
-- [ ] Display the dataframe
+- [x] Display the dataframe
 - [ ] Create and edit dataframes
     - [ ] Creating new columns
     - [ ] Deleting columns

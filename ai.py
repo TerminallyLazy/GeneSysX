@@ -1,6 +1,7 @@
 import openai
 import json
 from DNAToolKit import *
+from tabular_mods import *
 from fasta_2_string import fasta_to_string
 from API_SECRETS import OPEN_API_KEY
 
@@ -121,8 +122,6 @@ def run_conversation(user_input, sequences_as_string):
                 }
             }
         }
-
-
     ]
 
     response = openai.ChatCompletion.create(
@@ -180,6 +179,7 @@ def run_conversation(user_input, sequences_as_string):
                     function_response = function_to_call(
                         dna=function_args.get("dna"),
                     )
+                    
 
             except json.JSONDecodeError:
                 function_response = "An error occurred while decoding the function arguments."

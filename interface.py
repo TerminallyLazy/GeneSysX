@@ -24,9 +24,16 @@ elif data_type == "CSV":
     if csv_file is not None:
         st.write("CSV file uploaded. Displaying DataFrame:")
         
-        # CSV --> DF
-        df = pd.read_csv(csv_file)
+        df = pd.read_csv(csv_file)  # Read the CSV file into a DataFrame
         st.dataframe(df)
+        user_input = st.text_input("Enter some text:")
+
+    if st.button("Submit"):
+        # Convert the DataFrame to a JSON string and pass it to the conversation
+        df_json = df.to_json(orient="split")
+        st.write(run_conversation(user_input, df_json))
+    else:
+        st.write("Please upload a FASTA file.")
 
 elif data_type == "PDF":
     pdf_file = st.file_uploader("Upload a PDF file", type=["pdf"])

@@ -1,6 +1,6 @@
-# DecodeAI
+# GeneSys AI
 
-DecodeAI is an innovative and versatile tool designed to empower bioinformaticians, researchers, clinicians, and students in their genomics and bioinformatics endeavors. This chatbot harnesses the power of GPT (Generative Pre-trained Transformer) technology to provide a user-friendly, conversational interface for a wide range of genomic analysis tasks.
+GeneSys AI is an innovative and versatile tool designed to empower bioinformaticians, researchers, clinicians, and students in their genomics and bioinformatics endeavors. This chatbot harnesses the power of GPT (Generative Pre-trained Transformer) technology to provide a user-friendly, conversational interface for a wide range of genomic analysis tasks.
 
 ## Key Features:
 

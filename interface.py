@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from ai import run_conversation
 
-st.title("GenomeAI")
+st.title("🧬 GeneSys AI 🧬")
 
 data_type = st.radio("Select the type of data to upload:", ["FASTA", "CSV", "PDF"])
 

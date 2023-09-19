@@ -13,7 +13,6 @@ example.phy
 
 output.csv
 unaligned.dnd
-test.py
+
 pandasai.log
 Bioinformatics.code-workspace
-cache

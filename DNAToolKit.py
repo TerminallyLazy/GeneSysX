@@ -213,6 +213,26 @@ def restriction_sites(dna):
     
     return reverse_palindromes_str
 
+def detect_snps(seq1, seq2):
+    """
+    Detect singular nucleotide polymorphisms (SNPs) between two DNA sequences.
+    
+    Parameters:
+    - seq1, seq2: strings representing the DNA sequences to compare. They should be of the same length.
+
+    Returns:
+    - List of tuples (position, nucleotide_from_seq1, nucleotide_from_seq2) representing the SNPs.
+    """
+    
+    # Ensure both sequences are of the same length
+    if len(seq1) != len(seq2):
+        raise ValueError("The sequences should be of the same length.")
+    
+    # Detect SNPs
+    snps = [(i, seq1[i], seq2[i]) for i in range(len(seq1)) if seq1[i] != seq2[i]]
+
+    return snps
+
 dna = "AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG"
 
 print(open_reading_frames(dna))

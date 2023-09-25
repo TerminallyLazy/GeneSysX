@@ -21,28 +21,24 @@ BLAST searches: Implements various BLAST algorithms for sequence similarity sear
 ## General Data (.csv, .pdf, tabulated data, etc):
 
 - [x] Display the dataframe
-- [ ] Create and edit dataframes
-    - [ ] Creating new columns
-    - [ ] Deleting columns
-    - [ ] Creating new rows
-    - [ ] Deleting rows
-    - [ ] Renaming columns
-    - [ ] Renaming rows
-    - [ ] Merging Dataframes: Implement dataframe merging or joining operations (e.g., inner, outer, left, right joins).
-    - [ ] Sorting Dataframes: Allow users to sort dataframes based on one or more columns.
-    - [ ] Aggregating Data: Provide functions for data aggregation and group-by operations.
+- [x] Create and edit dataframes
+    - [x] Creating new columns and rows
+    - [x] Deleting columns and rows
+    - [x] Renaming columns and rows
+    - [x] Merging Dataframes: Implement dataframe merging or joining operations (e.g., inner, outer, left, right joins).
+    - [x] Sorting Dataframes: Allow users to sort dataframes based on one or more columns.
+    - [x] Aggregating Data: Provide functions for data aggregation and group-by operations.
     - [ ] Pivot Tables: Support the creation of pivot tables for summarizing and reshaping data.
-    - [ ] Filtering Data: Enable users to filter data based on specific conditions or criteria.
+    - [x] Filtering Data: Enable users to filter data based on specific conditions or criteria.
     - [ ] Data Transposition: Allow users to transpose dataframes (rows become columns, and vice versa).
-    - [ ] Data Type Conversion: Support conversion between different data types for dataframe columns.
-    - [ ] Data Validation: Implement data validation checks to ensure data integrity.
-    - [ ] Data Sampling: Allow users to randomly sample data from dataframes.
-- [ ] Data Visualization
+    - [x] Data Type Conversion: Support conversion between different data types for dataframe columns.
+    - [x] Data Sampling: Allow users to randomly sample data from dataframes.
+- [x] Data Visualization
     - [ ] Implement data visualization tools for exploring and visualizing datasets.
-    - [ ] Generate interactive charts and plots.
-- [ ] Statistical Analysis
-    - [ ] Provide statistical analysis functions for data summary and hypothesis testing.
-    - [ ] Calculate descriptive statistics (mean, median, standard deviation, etc.).
+    - [x] Generate interactive charts and plots.
+- [x] Statistical Analysis
+    - [x] Provide statistical analysis functions for data summary and hypothesis testing.
+    - [x] Calculate descriptive statistics (mean, median, standard deviation, etc.).
 - [ ] Export and Import
     - [ ] Enable data export in various formats (CSV, Excel, JSON, etc.).
     - [ ] Support data import from external sources and formats.

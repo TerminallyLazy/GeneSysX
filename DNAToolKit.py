@@ -1,6 +1,12 @@
 import random
 import collections
 import json
+from Bio import Phylo
+from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
+from Bio.Align import MultipleSeqAlignment
+from Bio import AlignIO
+from io import StringIO
+import matplotlib.pyplot as plt
 
 # Counting DNA Nucleotides
 
@@ -212,6 +218,12 @@ def restriction_sites(dna):
     reverse_palindromes_str = ', '.join(reverse_palindromes)
     
     return reverse_palindromes_str
+
+
+def msa(dna):
+    # TO DO: migrate local MSA code to here
+    pass
+
 
 def detect_snps(seq1, seq2):
     """

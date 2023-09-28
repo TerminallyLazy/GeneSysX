@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+from pandasai import SmartDataframe
+from pandasai.llm import OpenAI
+from API_SECRETS import OPEN_API_KEY
 from ai import run_conversation
 
 st.title("🧬 GeneSys AI 🧬")
@@ -24,12 +27,28 @@ elif data_type == "CSV":
     if csv_file is not None:
         st.write("CSV file uploaded. Displaying DataFrame:")
         
-        df = pd.read_csv(csv_file)  # Read the CSV file into a DataFrame
+        df = pd.read_csv(csv_file)
         st.dataframe(df)
-        user_input = st.text_input("Enter some text:")
+
+        llm = OpenAI(api_token=OPEN_API_KEY)
+        sdf = SmartDataframe(df, config={"llm": llm})
+
+        user_input = st.text_input("What is your request?")
+
+        if user_input:
+            st.write("User Input:")
+            st.write(user_input)
+
+            response = sdf.chat(user_input)
+
+            st.write("SmartDataframe Response:")
+            st.write(response)
+
+            if response == None:
+                st.image("exports/charts/temp_chart.png", caption="Chart Image", use_column_width=True)
+
 
     if st.button("Submit"):
-        # Convert the DataFrame to a JSON string and pass it to the conversation
         df_json = df.to_json(orient="split")
         st.write(run_conversation(user_input, df_json))
     else:

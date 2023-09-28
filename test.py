@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from pandasai import SmartDataframe
+from pandasai.middlewares import StreamlitMiddleware
 from pandasai.llm import OpenAI
 from API_SECRETS import OPEN_API_KEY
 
@@ -14,7 +15,7 @@ if uploaded_file is not None:
     st.write(df)
 
     llm = OpenAI(api_token=OPEN_API_KEY)
-    sdf = SmartDataframe(df, config={"llm": llm})
+    sdf = SmartDataframe(df, {"middlewares": [StreamlitMiddleware()]}, config={"llm": llm})
 
     user_input = st.text_input("What is your request?")
 

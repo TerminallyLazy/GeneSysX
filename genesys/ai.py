@@ -2,8 +2,8 @@ import os
 import json
 import openai
 
-from .DNAToolKit import *
-from .env import  load_dotenv
+from DNAToolKit import *
+from env import  load_dotenv
 
 
 load_dotenv()

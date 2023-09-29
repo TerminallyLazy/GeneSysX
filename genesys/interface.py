@@ -4,8 +4,8 @@ import pandas as pd
 from pandasai import SmartDataframe
 from pandasai.llm import OpenAI
 
-from .env import load_dotenv
-from .ai import run_conversation
+from env import load_dotenv
+from ai import run_conversation
 
 
 load_dotenv()

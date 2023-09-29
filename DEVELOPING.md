@@ -1,6 +1,6 @@
-# Contributing
+# Developing
 
-## Poetry
+## Package manager
 
 To run this project, you need to use the [Poetry package manager](https://python-poetry.org/docs/). If you are using [Homebrew](https://brew.sh), then you can run `brew install poetry`.
 

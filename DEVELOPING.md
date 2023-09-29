@@ -9,3 +9,8 @@ To run this project, you need to use the [Poetry package manager](https://python
 Create a `.env` file containing varibles required to run the application (e.g., your OpenAI API key).
 
 TODO: point to the environment variable validation logic instead of enumerating the required variables here.
+
+```sh
+# ik it says run twice
+poetry run streamlit run genesys/interface.py
+```

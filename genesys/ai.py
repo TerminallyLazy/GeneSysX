@@ -3,7 +3,6 @@ import json
 import openai
 
 from .DNAToolKit import *
-from .tabular_mods import *
 from .env import  load_dotenv
 
 

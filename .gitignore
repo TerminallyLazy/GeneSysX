@@ -1,2 +1,5 @@
 # macOS-specific
 .DS_Store
+
+# environment variables containing API keys and other secrets
+.env*

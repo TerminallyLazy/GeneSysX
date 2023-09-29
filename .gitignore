@@ -4,5 +4,8 @@
 # environment variables containing API keys and other secrets
 .env*
 
+# caches
+__pycache__
+
 # images generate by PandasAI
 exports/

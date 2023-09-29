@@ -1,9 +1,15 @@
+import os
 import streamlit as st
+
 import pandas as pd
 from pandasai import SmartDataframe
 from pandasai.llm import OpenAI
-from API_SECRETS import OPEN_API_KEY
+
+from env import load_dotenv
 from ai import run_conversation
+
+
+load_dotenv()
 
 st.title("🧬 GeneSys AI 🧬")
 
@@ -30,7 +36,7 @@ elif data_type == "CSV":
         df = pd.read_csv(csv_file)
         st.dataframe(df)
 
-        llm = OpenAI(api_token=OPEN_API_KEY)
+        llm = OpenAI(api_token=os.getenv("OPEN_API_KEY"))
         sdf = SmartDataframe(df, config={"llm": llm})
 
         user_input = st.text_input("What is your request?")

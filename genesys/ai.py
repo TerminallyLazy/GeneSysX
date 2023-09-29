@@ -1,11 +1,14 @@
-import openai
+import os
 import json
-from DNAToolKit import *
-from tabular_mods import *
-from fasta_2_string import fasta_to_string
-from API_SECRETS import OPEN_API_KEY
+import openai
 
-openai.api_key = OPEN_API_KEY
+from DNAToolKit import *
+from env import  load_dotenv
+
+
+load_dotenv()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def run_conversation(user_input, sequences_as_string):
     # Step 1: Send the user query and available functions to GPT-3.5 Turbo

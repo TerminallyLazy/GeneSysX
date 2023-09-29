@@ -1,22 +1,11 @@
-API_SECRETS.py
+# macOS-specific
+.DS_Store
+
+# environment variables containing API keys and other secrets
+.env*
+
+# caches
 __pycache__
 
-playground.ipynb
-
-rebase_data.txt
-
-unaligned.FASTA
-
-clustalw-2.1.macosx
-
-example.phy 
-
-output.csv
-unaligned.dnd
-
-pandasai.log
-Bioinformatics.code-workspace
-
-test.py
-
-exports/charts/temp_chart.png
+# images generate by PandasAI
+exports/

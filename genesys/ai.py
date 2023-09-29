@@ -1,9 +1,9 @@
-import openai
 import os
 import json
-from DNAToolKit import *
-from tabular_mods import *
-from API_SECRETS import OPEN_API_KEY
+import openai
+
+from .DNAToolKit import *
+from .tabular_mods import *
 from .env import  load_dotenv
 
 

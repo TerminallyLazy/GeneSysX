@@ -2,7 +2,6 @@ import openai
 import json
 from DNAToolKit import *
 from tabular_mods import *
-from fasta_2_string import fasta_to_string
 from API_SECRETS import OPEN_API_KEY
 
 openai.api_key = OPEN_API_KEY

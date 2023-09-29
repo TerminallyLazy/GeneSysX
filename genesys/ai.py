@@ -8,7 +8,7 @@ from env import  load_dotenv
 
 load_dotenv()
 
-openai.api_key = os.getenv("OPEN_API_KEY")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def run_conversation(user_input, sequences_as_string):
     # Step 1: Send the user query and available functions to GPT-3.5 Turbo

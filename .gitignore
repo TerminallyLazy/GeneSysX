@@ -3,3 +3,6 @@
 
 # environment variables containing API keys and other secrets
 .env*
+
+# images generate by PandasAI
+exports/

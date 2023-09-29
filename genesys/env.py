@@ -17,7 +17,7 @@ def load_dotenv():
     except ValueError:
         pass
 
-def values()
+def values():
     """TODO: Get a dictionary with environment variables.
 
     Using the `dotenv_values` function from `dotenv` will return a dictionary

@@ -3,7 +3,6 @@ import pandas as pd
 from pandasai import SmartDataframe
 from pandasai.middlewares import StreamlitMiddleware
 from pandasai.llm import OpenAI
-from API_SECRETS import OPEN_API_KEY
 
 st.title("InsightAI 🔎")
 

@@ -220,10 +220,24 @@ def restriction_sites(dna):
     return reverse_palindromes_str
 
 
-def msa(dna):
-    # TO DO: migrate local MSA code to here
-    pass
+def msa(fasta_files):
+    text_file = StringIO(fasta_files)
+    alignment = AlignIO.read(text_file, "fasta")
+    aligned_seqs = MultipleSeqAlignment(alignment)
 
+    return str(aligned_seqs)
+
+def construct_phylogenetic_tree(aligned_seqs):
+    calculator = DistanceCalculator("identity")
+    constructor = DistanceTreeConstructor(calculator)
+    tree = constructor.build_tree(aligned_seqs)
+    
+    fig, ax = plt.subplots(figsize=(10, 20))
+    Phylo.draw(tree, axes=ax)
+    
+    fig.savefig("phylogenetic_tree.png")
+    
+    return tree
 
 def detect_snps(seq1, seq2):
     """

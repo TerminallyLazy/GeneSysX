@@ -33,19 +33,19 @@ def render_protein():
     showmol(xyzview,height=500,width=800)
 
 def render_protein_file(pdb_file_content):
-    xyzview = py3Dmol.view(width=400, height=400)
-    xyzview.addModel(pdb_file_content, 'pdb')
+    pdbview = py3Dmol.view(width=400, height=400)
+    pdbview.addModel(pdb_file_content, 'pdb')
     bcolor = st.sidebar.color_picker('Pick A Color', '#FFFFFF')
     style = st.sidebar.selectbox('style',['cartoon','line','cross','stick','sphere'])
     spin = st.sidebar.checkbox('Spin', value = True)
-    xyzview.setStyle({style:{'color':'spectrum'}})
-    xyzview.setBackgroundColor(bcolor)
+    pdbview.setStyle({style:{'color':'spectrum'}})
+    pdbview.setBackgroundColor(bcolor)
     if spin:
-        xyzview.spin(True)
+        pdbview.spin(True)
     else:
-        xyzview.spin(False)
-    xyzview.zoomTo()
-    showmol(xyzview,height=500,width=800)
+        pdbview.spin(False)
+    pdbview.zoomTo()
+    showmol(pdbview,height=500,width=800)
 
 uploaded_files = st.sidebar.file_uploader("Upload your biological Data!", accept_multiple_files=True)
 for uploaded_file in uploaded_files:

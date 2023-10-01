@@ -14,6 +14,7 @@ import os
 from env import load_dotenv
 import logging
 from io import StringIO
+from time import time
 
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -31,7 +32,7 @@ if data_type == "FASTA":
     if fasta_file is not None:
 
         fasta_content = fasta_file.read().decode("utf-8")
-        url = get_s3_url(filename=fasta_file)
+        url = get_s3_url(filename=fasta_file.name)
         upload_content_to_s3(url, fasta_content)
 
         user_input = st.text_input("Enter some text:")
@@ -46,7 +47,7 @@ elif data_type == "PDB":
 
     if pdb_file is not None:
         pdb_content = pdb_file.read().decode("utf-8")
-        url = get_s3_url(filename=pdb_file)
+        url = get_s3_url(filename=pdb_file.name)
         upload_content_to_s3(url, pdb_content)
 
         render_protein_file(pdb_content)
@@ -61,7 +62,7 @@ elif data_type == "CSV":
         st.write("CSV file uploaded. Displaying DataFrame:")
         df = pd.read_csv(csv_file)
 
-        url = get_s3_url(filename=csv_file)
+        url = get_s3_url(filename=csv_file.name)
         upload_content_to_s3(url, df.to_csv(StringIO()))
 
         st.dataframe(df)
@@ -70,6 +71,9 @@ elif data_type == "CSV":
         sdf = SmartDataframe(df, config={"llm": llm})
 
         user_input = st.text_input("What is your request?")
+
+        url = get_s3_url(filename=f"ChatSession/query-{str(int(time()))}.txt")
+        upload_content_to_s3(url, user_input)
 
         if user_input:
             st.write("User Input:")
@@ -96,4 +100,4 @@ elif data_type == "PDF":
     if pdf_file is not None:
         st.write("PDF file uploaded. Add your processing logic.")
         # url = get_s3_url(pdf_file)
-        # upload_content_to_s3(url, pdf_content)
+        # upload_content_to_s3(url, pdf_content.name)

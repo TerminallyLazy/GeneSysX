@@ -1,7 +1,7 @@
 import random
 import collections
 import json
-from Bio import Phylo
+from Bio import Phylo, SeqIO
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from Bio.Align import MultipleSeqAlignment
 from Bio import AlignIO
@@ -49,25 +49,66 @@ aa_protein_mass = {'A': 71.03711,
                    'Y': 163.06333}
 
 
-# Validates whether a sequence is a DNA sequence or not
-def validateDNA(dna):
-    dna_seq = dna.upper()
-    replaced_seq = ''.join(random.choice(nucleotides) if n == 'N' else n for n in dna_seq)
-    return replaced_seq if set(replaced_seq) <= set(nucleotides) else False
+def sequence_type(filepath):
+    """ Determine the type of sequence in a FASTA file.
 
+    Args:
+        filepath (str): Path to the FASTA file.
+    """
 
-# Count the number of each nucleotide in a given DNA sequence
-def countNucleotides(dna):
-    count_dict = dict(collections.Counter(dna))
-    count_json = json.dumps(count_dict)
-    return count_json
+    with open(filepath, "r") as f:
+        for seq in SeqIO.parse(f, "fasta"):
+            seq_str = str(seq.seq)
+            if set(seq_str.upper()) <= set("ATGC"):
+                return "DNA"
+            elif set(seq_str.upper()) <= set("AUGC"):
+                return "RNA"
+            elif set(seq_str.upper()) <= set("ARNDCEQGHILKMFPSTWYV"):
+                return "Protein"
+    return "Unknown sequence type"
+    
+
+def count_occurences(filepath):
+    """ Count the number of nucleotides for each DNA/RNA sequence or amino acids for each protein in a FASTA file.
+
+    Args:
+        filepath (str): Path to the FASTA file.
+    
+    Returns:
+        dict: Dictionary with sequence IDs as keys and a Counter object as number of occurences.
+    """
+
+    if sequence_type(filepath) == "Unknown sequence type":
+        raise ValueError("Unable to perform operation: Unknown sequence type")
+    
+    sequences_dict = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
+
+    ret = {}
+
+    for seq_id, seq in sequences_dict.items():
+        seq_str = str(seq.seq)
+        ret[seq_id] = collections.Counter(seq_str)
+
+    return ret
 
 # Gives the complementary DNA sequence to a given DNA seq
 
-def transcription(dna):
-    transcribedSeq = dna.replace("T", "U")
-    return transcribedSeq
+def transcription(filepath):
+    
+    if sequence_type(filepath) == "RNA":
+        raise ValueError("The sequence is already RNA")
+    elif sequence_type(filepath) != "DNA":
+        raise ValueError("Unable to perform operation: Not a DNA sequence")
+    
+    sequences_dict = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
 
+    ret = {}
+
+    for seq_id, seq in sequences_dict.items():
+        seq_str = str(seq.seq)
+        ret[seq_id] = seq_str.replace("T", "U")
+    
+    return ret
 
 # Transcripts a given DNA sequence (gives the RNA version)
 def complementary(dna):
@@ -236,4 +277,3 @@ def detect_snps(seq1, seq2):
     snps = [(i, seq1[i], seq2[i]) for i in range(len(seq1)) if seq1[i] != seq2[i]]
 
     return snps
-

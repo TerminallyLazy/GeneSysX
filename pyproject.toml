@@ -15,6 +15,9 @@ biopython = "^1.81"
 python-dotenv = "^1.0.0"
 streamlit = "^1.27.1"
 beautifulsoup4 = "^4.12.2"
+stmol = "^0.0.9"
+ipython-genutils = "^0.2.0"
+httpx = "^0.25.0"
 
 
 [tool.poetry.group.dev.dependencies]

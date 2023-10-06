@@ -127,20 +127,16 @@ def run_conversation(user_input, sequences_as_string):
         },
         {
             "name": "multiple_sequence_alignment",
-            "description": "Performs a multiple sequence alignment (MSA) on the given DNA sequences.",
+            "description": "Performs a multiple sequence alignment (MSA) on the given DNA sequence.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "fasta_files": {
+                    "dna": {
                         "type": "string",
-                        "description": "The DNA sequences to perform the MSA on.",
-                        "items": {
-                            "type": "string",
-                            "description": "A DNA sequence to perform the MSA on.",
-                        }
+                        "description": "A DNA sequence.",
                     }
                 },
-                "required": ["fasta_files"]
+                "required": ["dna"]
             },
             "returns": {
                 "type": "string",
@@ -204,7 +200,7 @@ def run_conversation(user_input, sequences_as_string):
                     )
                 elif function_name == "multiple_sequence_alignment":
                     function_response = function_to_call(
-                        fasta_files=function_args.get("fasta_files")
+                        dna=function_args.get("dna")
                     )
                 else:
                     function_response = function_to_call(

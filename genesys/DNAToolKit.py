@@ -48,34 +48,12 @@ aa_protein_mass = {'A': 71.03711,
                    'W': 186.07931,
                    'Y': 163.06333}
 
-# Generates a random DNA sequence with a specified length
-
-
-def randomDNA(length_of_DNA):
-    randDNA = ""
-    for i in range(length_of_DNA):
-        randNuc = random.choice(nucleotides)
-        randDNA += randNuc
-    return randDNA
 
 # Validates whether a sequence is a DNA sequence or not
-
-
 def validateDNA(dna):
     dna_seq = dna.upper()
-    replaced_seq = ""
-
-    for nucleotide in dna_seq:
-        if nucleotide == 'N':
-            # Replace 'N' with a random nucleotide
-            random_nucleotide = random.choice(nucleotides)
-            replaced_seq += random_nucleotide
-        elif nucleotide not in nucleotides:
-            return False
-        else:
-            replaced_seq += nucleotide
-
-    return replaced_seq
+    replaced_seq = ''.join(random.choice(nucleotides) if n == 'N' else n for n in dna_seq)
+    return replaced_seq if set(replaced_seq) <= set(nucleotides) else False
 
 
 # Count the number of each nucleotide in a given DNA sequence
@@ -220,8 +198,8 @@ def restriction_sites(dna):
     return reverse_palindromes_str
 
 
-def multiple_sequence_alignment(fasta_files):
-    text_file = StringIO(fasta_files)
+def multiple_sequence_alignment(dna):
+    text_file = StringIO(dna)
     alignment = AlignIO.read(text_file, "fasta")
     aligned_seqs = MultipleSeqAlignment(alignment)
 

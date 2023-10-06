@@ -3778,20 +3778,20 @@ snowflake = ["snowflake-snowpark-python"]
 
 [[package]]
 name = "streamlit-authenticator"
-version = "0.2.3"
+version = "0.1.5"
 description = "A secure authentication module to validate user credentials in a Streamlit application."
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "streamlit-authenticator-0.2.3.tar.gz", hash = "sha256:7693c5ae9821ae774447d2e75cff15eff9b9f026b25f33b94f6962b9e2fe9dbc"},
+    {file = "streamlit-authenticator-0.1.5.tar.gz", hash = "sha256:a844a2ee8dc82175a39b4f2b01b5ec884d961fcbf973db8c8ec41a5a45986680"},
 ]
 
 [package.dependencies]
 bcrypt = ">=3.1.7"
-extra-streamlit-components = ">=0.1.60"
+extra-streamlit-components = ">=0.1.53"
 PyJWT = ">=2.3.0"
 PyYAML = ">=5.3.1"
-streamlit = ">=1.18.0"
+streamlit = ">=0.86"
 
 [[package]]
 name = "tenacity"
@@ -4272,4 +4272,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "3f3f5b50a9179f30a3ae2a74f855a412d266609bc0cc3e61717c64e5ef82b26f"
+content-hash = "4f30ccddb69ce38a26297e4320bbf7fe69fc1b431a8ece73c351a4262e30c02a"

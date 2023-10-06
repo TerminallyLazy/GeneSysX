@@ -18,7 +18,7 @@ beautifulsoup4 = "^4.12.2"
 stmol = "^0.0.9"
 ipython-genutils = "^0.2.0"
 httpx = "^0.25.0"
-streamlit-authenticator = "^0.2.3"
+streamlit-authenticator = "0.1.5"
 
 
 [tool.poetry.group.dev.dependencies]

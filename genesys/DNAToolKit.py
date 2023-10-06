@@ -220,7 +220,7 @@ def restriction_sites(dna):
     return reverse_palindromes_str
 
 
-def msa(fasta_files):
+def multiple_sequence_alignment(fasta_files):
     text_file = StringIO(fasta_files)
     alignment = AlignIO.read(text_file, "fasta")
     aligned_seqs = MultipleSeqAlignment(alignment)

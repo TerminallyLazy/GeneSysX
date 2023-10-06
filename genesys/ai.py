@@ -124,7 +124,30 @@ def run_conversation(user_input, sequences_as_string):
                     }
                 }
             }
+        },
+        {
+            "name": "multiple_sequence_alignment",
+            "description": "Performs a multiple sequence alignment (MSA) on the given DNA sequences.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "fasta_files": {
+                        "type": "string",
+                        "description": "The DNA sequences to perform the MSA on.",
+                        "items": {
+                            "type": "string",
+                            "description": "A DNA sequence to perform the MSA on.",
+                        }
+                    }
+                },
+                "required": ["fasta_files"]
+            },
+            "returns": {
+                "type": "string",
+                "description": "The MSA of the given DNA sequences.",
+            }
         }
+
     ]
 
     response = openai.ChatCompletion.create(
@@ -145,7 +168,8 @@ def run_conversation(user_input, sequences_as_string):
             "restriction_sites": restriction_sites,
             "translation": translation,
             "protein_mass": protein_mass,
-            "open_reading_frames": open_reading_frames
+            "open_reading_frames": open_reading_frames,
+            "multiple_sequence_alignment": multiple_sequence_alignment
         }
         
         function_name = response_message["function_call"]["name"]
@@ -177,6 +201,10 @@ def run_conversation(user_input, sequences_as_string):
                 elif function_name == "open_reading_frames":
                     function_response = function_to_call(
                         dna=function_args.get("dna")
+                    )
+                elif function_name == "multiple_sequence_alignment":
+                    function_response = function_to_call(
+                        fasta_files=function_args.get("fasta_files")
                     )
                 else:
                     function_response = function_to_call(

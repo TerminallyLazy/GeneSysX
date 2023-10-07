@@ -90,7 +90,7 @@ def complementary(filepath):
 
     for seq_id, seq_record in sequences.items():
 
-        if sequence_type(filepath) == "Protein":
+        if sequence_type(filepath) != "DNA":
             raise ValueError("Unable to perform operation: Not a DNA sequence")
         
         sequence = seq_record.seq
@@ -209,11 +209,14 @@ def find_recognition_sites(dna_sequence, enzyme_name):
     recognition_sites = [(site, sequence[site:site + len(enzyme.site)]) for site in cut_sites]
     return recognition_sites
 
-def find_print_recognition_sites(filepath):
+def restriction_sites(filepath):
     enzyme_names = ["EcoRI", "HindIII", "BamHI", "XhoI", "NotI", "SalI", "EcoRV", "PstI", "KpnI", "SmaI"]
 
     sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
     result = {}
+
+    if sequence_type(filepath) != "DNA":
+        raise ValueError("Unable to perform operation: Not a DNA sequence")
 
     for seq_id, seq_record in sequences.items():
         dna_sequence = str(seq_record.seq)
@@ -225,12 +228,7 @@ def find_print_recognition_sites(filepath):
         if enzyme_sites:
             result[seq_id] = enzyme_sites
 
-    for seq_id, enzyme_sites in result.items():
-        print(f"Recognition sites for sequence {seq_id}:")
-        for enzyme_name, seq_sites in enzyme_sites.items():
-            print(f"  Enzyme: {enzyme_name}")
-            for site, site_seq in seq_sites:
-                print(f"    Position {site}: {site_seq}")
+    return result
 
 
 
@@ -294,5 +292,3 @@ def detect_snps(seq1, seq2):
     snps = [(i, seq1[i], seq2[i]) for i in range(len(seq1)) if seq1[i] != seq2[i]]
 
     return snps
-
-print(transcription("tests/fixtures/sequence.fasta"))

@@ -6,14 +6,17 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
 num_sequences = 5
-sequence_length = 50
+sequence_length = 500
 
 def generate_random_rna_sequence(length):
     return ''.join(random.choice('AUGC') for _ in range(length))
 
-sequences = [SeqRecord(Seq(generate_random_rna_sequence(sequence_length)), id=f"RNA_{i+1}") for i in range(num_sequences)]
+def generate_random_dna_sequence(length):
+    return ''.join(random.choice('ATGC') for _ in range(length))
 
-output_file = "tests/fixtures/random_rna.fasta"
+sequences = [SeqRecord(Seq(generate_random_dna_sequence(sequence_length)), id=f"DNA_{i+1}") for i in range(num_sequences)]
+
+output_file = "tests/fixtures/random_dna.fasta"
 
 with open(output_file, "w") as f:
     SeqIO.write(sequences, f, "fasta")

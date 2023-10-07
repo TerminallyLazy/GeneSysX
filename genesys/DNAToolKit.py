@@ -2,6 +2,9 @@ import random
 import collections
 import json
 from Bio import Phylo, SeqIO
+from Bio.SeqUtils.ProtParam import molecular_weight
+from Bio.Seq import Seq
+from Bio.SeqUtils import gc_fraction
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from Bio.Align import MultipleSeqAlignment
 from Bio import AlignIO
@@ -111,22 +114,30 @@ def transcription(filepath):
     return ret
 
 # Transcripts a given DNA sequence (gives the RNA version)
-def complementary(dna):
-    dna = dna.replace("T", "U")
-    compSeq = ''
-    for i in dna:
-        if i == 'A':
-            compSeq += 'T'
-        elif i == 'U':
-            compSeq += 'A'
-        elif i == 'C':
-            compSeq += 'G'
-        elif i == 'G':
-            compSeq += 'C'
-        else:
-            compSeq += i
-    
-    return compSeq
+def complementary(filepath):
+    """
+    Find the complementary DNA sequence to a given DNA sequence.
+
+    Parameters:
+    - filepath: Path to the FASTA file containing the DNA sequence.
+
+    Returns:
+    - A string containing the complementary DNA sequence.
+    """
+    sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
+    complementary_sequences = {}
+
+    for seq_id, seq_record in sequences.items():
+
+        if sequence_type(filepath) == "Protein":
+            raise ValueError("Unable to perform operation: Not a DNA sequence")
+        
+        sequence = seq_record.seq
+        complementary_sequence = str(sequence.complement())
+        complementary_sequences[seq_id] = complementary_sequence
+
+    return complementary_sequences
+
 
 # Gives the reverse complementary DNA sequence to a given DNA seq   
 
@@ -137,91 +148,93 @@ def reverseComplementary(dna):
 
 # The combined above two functions into one GC content calculator
 
-def GC_Content_combined(dna, k=None):
-    if k is None:
-        total_GC = dna.count('G') + dna.count('C')
-        GC_percentage = (total_GC / len(dna)) * 100
-        result = print(f"GC Content: {GC_percentage}")
-    else:
-        subsections = []
-        for i in range(0, len(dna) - k + 1, k):
-            subsections.append(dna[i:i+k])
+def gc_content(filepath):
 
-        for i in range(len(subsections)):
-            total_GC = subsections[i].count('G') + subsections[i].count('C')
-            GC_percentage = 100 * (total_GC / len(subsections[i]))
-            result = print(
-                f"Subsection: {subsections[i]} - GC Content: {GC_percentage}")
+    sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
+    gc_contents = {}
 
-    return result
+    for seq_id, seq_record in sequences.items():
+        if sequence_type(filepath) == "Protein":
+            raise ValueError("Unable to perform operation: Not a DNA sequence")
+        
+        sequence = seq_record.seq
+        gc_content = round(gc_fraction(sequence) * 100, 2)
+        gc_contents[seq_id] = gc_content
+
+    return gc_contents
 
 
-def translation(dna):
+def translation(filepath):
+    """
+    Translate a DNA sequence to its protein sequence.
 
-    dna = transcription(dna)
+    Parameters:
+    - filepath: Path to the FASTA file containing the DNA sequence.
 
-    if len(dna) == 0:
-        return ""
+    Returns:
+    - A string containing the protein sequence.
+    """
+
+    sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
+    translated_sequences = {}
+
+    for seq_id, seq_record in sequences.items():
+        if sequence_type(filepath) != "DNA":
+            raise ValueError("Unable to perform operation: Not a DNA sequence")
+
+        sequence = seq_record.seq
+        num_n_to_add = 3 - (len(sequence) % 3)
+        sequence = sequence + Seq("N" * num_n_to_add)
+        
+        translated_sequence = str(sequence.translate())
+        translated_sequences[seq_id] = translated_sequence
+
+    return translated_sequences
+
+
+def find_invalid_amino_acid(sequence):
+    invalid_positions = []
+    for i, aa in enumerate(sequence):
+        if aa not in "ACDEFGHIKLMNPQRSTVWY":
+            invalid_positions.append((aa, i))
+    return invalid_positions
+
+def mass_calculator(filepath):
+    """
+    Calculate the mass of a DNA, RNA, or protein sequence.
+
+    Parameters:
+    - filepath (str): Path to the FASTA file containing sequences.
+
+    Returns:
+    - A dictionary where keys are sequence IDs and values are the calculated molecular weights or error messages.
+    """
+    sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
+    masses = {}
+
+    for seq_id, seq_record in sequences.items():
+        sequence = seq_record.seq
+        seq_type = sequence_type(filepath)
+        
+        try:
+            if seq_type == "DNA":
+                masses[seq_id] = molecular_weight(sequence)
+            elif seq_type == "RNA":
+                masses[seq_id] = molecular_weight(sequence, "RNA")
+            elif seq_type == "Protein":
+                invalid_positions = find_invalid_amino_acid(sequence)
+                if invalid_positions:
+                    error_message = f"Invalid amino acid(s) found in sequence {seq_id}: {', '.join(f'{aa} at position {pos}' for aa, pos in invalid_positions)}"
+                    raise ValueError(error_message)
+                masses[seq_id] = molecular_weight(sequence, "protein")
+        except ValueError as e:
+            masses[seq_id] = str(e)
     
-    translated_seq = ""
+    return masses
 
-    for i in range(0, len(dna) - 2, 3):
-        codon = dna[i:i+3]
-
-        if codon in codon_table:
-            amino_acid = codon_table[codon]
-            
-            # Check if the amino acid is a stop codon
-            if amino_acid == "*":
-                break 
-            else:
-                translated_seq += amino_acid
-        else:
-            translated_seq += '?'
-
-    return translated_seq
-
-
-
-def protein_mass(dna):
-    
-    prot_mass = 0
-    for aa in dna:
-        if aa in aa_protein_mass:
-            prot_mass += aa_protein_mass[aa]
-        else:
-            print(f"Warning: Unknown amino acid '{aa}' encountered.")
-    
-    return str(prot_mass)
-
-
-
-def hamming_distance(dna1, dna2):
-    if len(dna1) != len(dna2):
-        raise ValueError("Input sequences must have the same length")
-
-    hammingDist = 0
-    for i in range(len(dna1)):
-        if dna1[i] != dna2[i]:
-            hammingDist += 1
-
-    return hammingDist
-
-
-def open_reading_frames(dna):
-    seq1 = dna
-    seq2 = dna[1:]
-    seq3 = dna[2:]
-
-    frame1 = translation(seq1)
-    frame2 = translation(seq2)
-    frame3 = translation(seq3)
-
-    # Concatenate the protein sequences into a single string
-    combined_frames = frame1 + frame2 + frame3
-
-    return combined_frames
-
+#TO DO : revist this function
+def open_reading_frames(filepath):
+    pass
 
 def restriction_sites(dna):
     reverse_palindromes = []
@@ -277,3 +290,5 @@ def detect_snps(seq1, seq2):
     snps = [(i, seq1[i], seq2[i]) for i in range(len(seq1)) if seq1[i] != seq2[i]]
 
     return snps
+
+print(open_reading_frames("tests/fixtures/sequence.fasta"))

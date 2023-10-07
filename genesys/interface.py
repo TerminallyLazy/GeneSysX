@@ -56,18 +56,26 @@ if authentication_status:
 
 
     if data_type == "FASTA":
-        fasta_file = st.file_uploader("Upload a FASTA file", type=["fasta", "fa", "txt"])
+        if data_type == "FASTA":
+            fasta_file = st.file_uploader("Upload a FASTA file", type=["fasta", "fa", "txt"])
+            
+            if fasta_file is not None:
+                temp_file_path = os.path.join("/tmp", fasta_file.name)
+                with open(temp_file_path, "wb") as temp_file:
+                    temp_file.write(fasta_file.read())
+                
+                # Now, temp_file_path contains the file path to the uploaded file
+                st.success(f"File uploaded successfully. File path: {temp_file_path}")
 
         if fasta_file is not None:
 
-            fasta_content = fasta_file.read().decode("utf-8")
-            url = get_s3_url(filename=fasta_file.name)
-            upload_content_to_s3(url, fasta_content)
+            #url = get_s3_url(filename=fasta_file.name)
+            #upload_content_to_s3(url, fasta_content)
 
             user_input = st.text_input("Enter some text:")
 
             if st.button("Submit"): 
-                st.write(run_conversation(user_input, fasta_content))
+                st.write(run_conversation(user_input, temp_file_path))
         else:
             st.write("Please upload a FASTA file.")
 

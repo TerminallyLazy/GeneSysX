@@ -295,4 +295,4 @@ def detect_snps(seq1, seq2):
 
     return snps
 
-print(construct_phylogenetic_tree("tests/fixtures/msa.fasta"))
+print(transcription("tests/fixtures/sequence.fasta"))

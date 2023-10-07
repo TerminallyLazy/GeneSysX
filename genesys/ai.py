@@ -3,144 +3,40 @@ import json
 import openai
 
 from DNAToolKit import *
-from env import  load_dotenv
-
+from env import load_dotenv
 
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-def run_conversation(user_input, sequences_as_string):
+def run_conversation(user_input, fasta_file):
     # Step 1: Send the user query and available functions to GPT-3.5 Turbo
-    messages = [{"role": "user", "content": f"Take the user's request {user_input} and perform the respective actions to the following the DNA sequence: {sequences_as_string}"}]
-    
+    messages = [{"role": "user", "content": f"Take the user's request {user_input} and perform the respective actions on the given FASTA file: {fasta_file}"}]
+    print("The file is:", fasta_file)
+
     functions = [
         {
-            "name": "countNucleotides",
-            "description": "Count nucleotides in a DNA sequence",
+            "name": "sequence_type",
+            "description": "Determine the type of sequence in a FASTA file and return the result.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "dna": {
+                    "filepath": {
                         "type": "string",
-                        "description": "The DNA sequence to count nucleotides",
-                    },
-                },
-                "required": ["dna"],
-            },
-        },
-        {
-            "name": "transcription",
-            "description": "Transcribe an RNA sequence to its complementary DNA sequence",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The DNA sequence to transcribe",
-                    },
-                },
-                "required": ["dna"],
-            },
-        },
-        {
-            "name": "translation",
-            "description": "Translates the sequence to it's protein sequence",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The sequence to be translated",
-                    },
-                },
-                "required": ["dna"],
-            },
-        },
-        {
-            "name": "restriction_sites",
-            "description": "Finds the restriction sites of a given DNA seq",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The DNA sequence to look at",
-                    },
-                },
-                "required": ["dna"],
-            },
-            "returns": {
-                "type": "string",
-                "description": "A string containing the restriction sites found in the DNA sequence.",
-            }
-        },
-        {
-            "name": "protein_mass",
-            "description": "Calculates the protein mass from the protein sequence",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The DNA sequence to look at",
-                    },
-                },
-                "required": ["dna"],
-            },
-            "returns": {
-                "type": "string",
-                "description": "The protein mass found in the DNA sequence.",
-            }
-        },
-        {
-            "name": "open_reading_frames",
-            "description": "Calculates the open reading frames (ORFs) from a given DNA sequence and translates them into protein sequences.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The DNA sequence to analyze for open reading frames (ORFs).",
+                        "description": "Path to the FASTA file."
                     }
                 },
-                "required": ["dna"]
+                "required": ["filepath"]
             },
             "returns": {
                 "type": "object",
-                "description": "An object containing the translated protein sequences derived from the identified open reading frames (ORFs).",
                 "properties": {
-                    "frame1": {
+                    "sequence_type": {
                         "type": "string",
-                        "description": "The protein sequence translated from the first reading frame.",
-                    },
-                    "frame2": {
-                        "type": "string",
-                        "description": "The protein sequence translated from the second reading frame.",
-                    },
-                    "frame3": {
-                        "type": "string",
-                        "description": "The protein sequence translated from the third reading frame.",
-                    }
-                }
-            }
-        },
-        {
-            "name": "multiple_sequence_alignment",
-            "description": "Performs a multiple sequence alignment (MSA) on the given DNA sequence.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "A DNA sequence.",
+                        "description": "The determined type of sequence (e.g., 'DNA', 'RNA', 'Protein')."
                     }
                 },
-                "required": ["dna"]
-            },
-            "returns": {
-                "type": "string",
-                "description": "The MSA of the given DNA sequences.",
+                "description": "The result of sequence type determination."
             }
         }
 
@@ -155,79 +51,52 @@ def run_conversation(user_input, sequences_as_string):
 
     response_message = response["choices"][0]["message"]
 
+    # Initialize function_response with a default value
+    function_response = None
+
     # Step 2: Check if GPT wants to call a function
     if response_message.get("function_call"):
         # Step 3: Call the function based on the model's response
         available_functions = {
-            "transcription": transcription,
-            "countNucleotides": countNucleotides,
-            "restriction_sites": restriction_sites,
-            "translation": translation,
-            "protein_mass": protein_mass,
-            "open_reading_frames": open_reading_frames,
-            "multiple_sequence_alignment": multiple_sequence_alignment
+            "sequence_type": sequence_type
         }
-        
+
         function_name = response_message["function_call"]["name"]
         function_to_call = available_functions.get(function_name)
 
         if function_to_call is not None:
             try:
                 function_args = json.loads(response_message["function_call"]["arguments"])
-                if function_name == "countNucleotides":
+                if function_name == "sequence_type":
                     function_response = function_to_call(
-                        dna=function_args.get("dna"),
-                    )
-                elif function_name == "transcription":
-                    function_response = function_to_call(
-                        dna=function_args.get("dna"),
-                    )
-                elif function_name == "restriction_sites":
-                    function_response = function_to_call(
-                        dna=function_args.get("dna"),
-                    )
-                elif function_name == "translation":
-                    function_response = function_to_call(
-                        dna=function_args.get("dna")
-                    )
-                elif function_name == "protein_mass":
-                    function_response = function_to_call(
-                        dna=function_args.get("dna")
-                    )
-                elif function_name == "open_reading_frames":
-                    function_response = function_to_call(
-                        dna=function_args.get("dna")
-                    )
-                elif function_name == "multiple_sequence_alignment":
-                    function_response = function_to_call(
-                        dna=function_args.get("dna")
+                        filepath=function_args.get("filepath"),
                     )
                 else:
-                    function_response = function_to_call(
-                        dna=function_args.get("dna"),
-                    )
-                    
+                    # Add handling for other functions if needed
+                    pass
 
             except json.JSONDecodeError:
                 function_response = "An error occurred while decoding the function arguments."
 
-        # Step 4: Extend the conversation with the function call and response
-        messages.append(response_message)  # Extend conversation with assistant's reply
+    # Step 4: Extend the conversation with the function call and response
+    messages.append(response_message)  # Extend the conversation with the assistant's reply
+    if function_response is not None:
         messages.append(
             {
                 "role": "function",
                 "name": function_name,
                 "content": function_response,
             }
-        )  # Extend conversation with function response
+        )  # Extend the conversation with the function response
 
-        # Step 5: Send the extended conversation to GPT for further interaction
-        second_response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0613",
-            messages=messages,
-        )
+    # Step 5: Send the extended conversation to GPT for further interaction
+    second_response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-0613",
+        messages=messages,
+    )
 
-        answer = second_response["choices"][0]["message"]["content"]
+    answer = second_response["choices"][0]["message"]["content"]
 
-        return answer
+    return answer
 
+#print(run_conversation("what type of sequence is the given fasta file ?", "tests/fixtures/msa.fasta"))

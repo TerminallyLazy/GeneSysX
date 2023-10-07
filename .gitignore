@@ -9,3 +9,4 @@ __pycache__
 
 # images generate by PandasAI
 exports/
+phylogenetic_tree.png

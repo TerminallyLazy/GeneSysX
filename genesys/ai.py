@@ -9,15 +9,28 @@ load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+
 def run_conversation(user_input, fasta_file):
     # Step 1: Send the user query and available functions to GPT-3.5 Turbo
-    messages = [{"role": "user", "content": f"Take the user's request {user_input} and perform the respective actions on the given FASTA file: {fasta_file}"}]
-    print("The file is:", fasta_file)
+    messages = [
+        {
+            "role": "system",
+            "content": "Be a bioinformatician who answers questions about a FASTA file with the given path."
+        },
+        {
+            "role": "user",
+            "content": f"""
+                {user_input}
+
+                '{fasta_file}'
+            """
+        }
+    ]
 
     functions = [
         {
             "name": "sequence_type",
-            "description": "Determine the type of sequence in a FASTA file and return the result.",
+            "description": "Get the type of sequences in a FASTA file.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -33,10 +46,9 @@ def run_conversation(user_input, fasta_file):
                 "properties": {
                     "sequence_type": {
                         "type": "string",
-                        "description": "The determined type of sequence (e.g., 'DNA', 'RNA', 'Protein')."
+                        "enum": ["DNA", "RNA", "Protein", "Unknown"],
                     }
                 },
-                "description": "The result of sequence type determination."
             }
         }
 
@@ -66,7 +78,8 @@ def run_conversation(user_input, fasta_file):
 
         if function_to_call is not None:
             try:
-                function_args = json.loads(response_message["function_call"]["arguments"])
+                function_args = json.loads(
+                    response_message["function_call"]["arguments"])
                 if function_name == "sequence_type":
                     function_response = function_to_call(
                         filepath=function_args.get("filepath"),
@@ -79,7 +92,8 @@ def run_conversation(user_input, fasta_file):
                 function_response = "An error occurred while decoding the function arguments."
 
     # Step 4: Extend the conversation with the function call and response
-    messages.append(response_message)  # Extend the conversation with the assistant's reply
+    # Extend the conversation with the assistant's reply
+    messages.append(response_message)
     if function_response is not None:
         messages.append(
             {
@@ -99,4 +113,6 @@ def run_conversation(user_input, fasta_file):
 
     return answer
 
-#print(run_conversation("what type of sequence is the given fasta file ?", "tests/fixtures/msa.fasta"))
+
+print(run_conversation("what type of sequence is the given fasta file ?",
+      "tests/fixtures/random_dna.fasta"))

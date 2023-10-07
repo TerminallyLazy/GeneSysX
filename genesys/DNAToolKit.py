@@ -10,6 +10,7 @@ from Bio import AlignIO
 from io import StringIO
 import matplotlib.pyplot as plt
 
+
 def sequence_type(filepath):
     """ Determine the type of sequence in a FASTA file.
 
@@ -30,21 +31,20 @@ def sequence_type(filepath):
     except FileNotFoundError:
         return f"File not found: {filepath}"
 
-    
 
 def count_occurences(filepath):
     """ Count the number of nucleotides for each DNA/RNA sequence or amino acids for each protein in a FASTA file.
 
     Args:
         filepath (str): Path to the FASTA file.
-    
+
     Returns:
         dict: Dictionary with sequence IDs as keys and a Counter object as number of occurences.
     """
 
     if sequence_type(filepath) == "Unknown sequence type":
         raise ValueError("Unable to perform operation: Unknown sequence type")
-    
+
     sequences_dict = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
 
     ret = {}
@@ -57,13 +57,14 @@ def count_occurences(filepath):
 
 # Gives the complementary DNA sequence to a given DNA seq
 
+
 def transcription(filepath):
-    
+
     if sequence_type(filepath) == "RNA":
         raise ValueError("The sequence is already RNA")
     elif sequence_type(filepath) != "DNA":
         raise ValueError("Unable to perform operation: Not a DNA sequence")
-    
+
     sequences_dict = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
 
     ret = {}
@@ -71,10 +72,12 @@ def transcription(filepath):
     for seq_id, seq in sequences_dict.items():
         seq_str = str(seq.seq)
         ret[seq_id] = seq_str.replace("T", "U")
-    
+
     return ret
 
 # Transcripts a given DNA sequence (gives the RNA version)
+
+
 def complementary(filepath):
     """
     Find the complementary DNA sequence to a given DNA sequence.
@@ -92,7 +95,7 @@ def complementary(filepath):
 
         if sequence_type(filepath) != "DNA":
             raise ValueError("Unable to perform operation: Not a DNA sequence")
-        
+
         sequence = seq_record.seq
         complementary_sequence = str(sequence.complement())
         complementary_sequences[seq_id] = complementary_sequence
@@ -100,7 +103,7 @@ def complementary(filepath):
     return complementary_sequences
 
 
-# Gives the reverse complementary DNA sequence to a given DNA seq   
+# Gives the reverse complementary DNA sequence to a given DNA seq
 
 def reverseComplementary(dna):
     reverseSeq = complementary(dna)
@@ -108,6 +111,7 @@ def reverseComplementary(dna):
     return reverseSeq[::-1]
 
 # The combined above two functions into one GC content calculator
+
 
 def gc_content(filepath):
 
@@ -117,7 +121,7 @@ def gc_content(filepath):
     for seq_id, seq_record in sequences.items():
         if sequence_type(filepath) == "Protein":
             raise ValueError("Unable to perform operation: Not a DNA sequence")
-        
+
         sequence = seq_record.seq
         gc_content = round(gc_fraction(sequence) * 100, 2)
         gc_contents[seq_id] = gc_content
@@ -146,7 +150,7 @@ def translation(filepath):
         sequence = seq_record.seq
         num_n_to_add = 3 - (len(sequence) % 3)
         sequence = sequence + Seq("N" * num_n_to_add)
-        
+
         translated_sequence = str(sequence.translate())
         translated_sequences[seq_id] = translated_sequence
 
@@ -159,6 +163,7 @@ def find_invalid_amino_acid(sequence):
         if aa not in "ACDEFGHIKLMNPQRSTVWY":
             invalid_positions.append((aa, i))
     return invalid_positions
+
 
 def mass_calculator(filepath):
     """
@@ -176,7 +181,7 @@ def mass_calculator(filepath):
     for seq_id, seq_record in sequences.items():
         sequence = seq_record.seq
         seq_type = sequence_type(filepath)
-        
+
         try:
             if seq_type == "DNA":
                 masses[seq_id] = molecular_weight(sequence)
@@ -190,27 +195,34 @@ def mass_calculator(filepath):
                 masses[seq_id] = molecular_weight(sequence, "protein")
         except ValueError as e:
             masses[seq_id] = str(e)
-    
+
     return masses
 
-#TO DO : revist this function
+# TO DO : revist this function
+
+
 def open_reading_frames(filepath):
     pass
+
 
 def find_recognition_sites(dna_sequence, enzyme_name):
     sequence = Seq(dna_sequence)
     enzyme = getattr(Restriction, enzyme_name, None)
-    
+
     if enzyme is None:
-        raise ValueError(f"Enzyme '{enzyme_name}' not found in Biopython's Restriction module.")
+        raise ValueError(
+            f"Enzyme '{enzyme_name}' not found in Biopython's Restriction module.")
 
     cut_sites = enzyme.search(sequence)
 
-    recognition_sites = [(site, sequence[site:site + len(enzyme.site)]) for site in cut_sites]
+    recognition_sites = [(site, sequence[site:site + len(enzyme.site)])
+                         for site in cut_sites]
     return recognition_sites
 
+
 def restriction_sites(filepath):
-    enzyme_names = ["EcoRI", "HindIII", "BamHI", "XhoI", "NotI", "SalI", "EcoRV", "PstI", "KpnI", "SmaI"]
+    enzyme_names = ["EcoRI", "HindIII", "BamHI", "XhoI",
+                    "NotI", "SalI", "EcoRV", "PstI", "KpnI", "SmaI"]
 
     sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
     result = {}
@@ -231,7 +243,6 @@ def restriction_sites(filepath):
     return result
 
 
-
 def multiple_sequence_alignment(filepath):
     """
     Perform multiple sequence alignment on a FASTA file.
@@ -244,10 +255,11 @@ def multiple_sequence_alignment(filepath):
     """
     with open(filepath, "r") as text_file:
         alignment = AlignIO.read(text_file, "fasta")
-    
+
     aligned_seqs = MultipleSeqAlignment(alignment)
 
     return aligned_seqs
+
 
 def construct_phylogenetic_tree(filepath):
     """
@@ -264,31 +276,35 @@ def construct_phylogenetic_tree(filepath):
     calculator = DistanceCalculator("identity")
     constructor = DistanceTreeConstructor(calculator)
     tree = constructor.build_tree(aligned_seqs)
-    
+
     fig, ax = plt.subplots(figsize=(10, 20))
     Phylo.draw(tree, axes=ax)
-    
+
     fig.savefig("phylogenetic_tree.png")
-    
+
     return tree
 
 # REVISIT THIS FUNCTION WITH CHARLIE
+
+
 def detect_snps(seq1, seq2):
     """
     Detect singular nucleotide polymorphisms (SNPs) between two DNA sequences.
-    
+
     Parameters:
     - seq1, seq2: strings representing the DNA sequences to compare. They should be of the same length.
 
     Returns:
     - List of tuples (position, nucleotide_from_seq1, nucleotide_from_seq2) representing the SNPs.
     """
-    
+
     # Ensure both sequences are of the same length
     if len(seq1) != len(seq2):
         raise ValueError("The sequences should be of the same length.")
-    
+
     # Detect SNPs
-    snps = [(i, seq1[i], seq2[i]) for i in range(len(seq1)) if seq1[i] != seq2[i]]
+    snps = [(i, seq1[i], seq2[i])
+            for i in range(len(seq1)) if seq1[i] != seq2[i]]
 
     return snps
+

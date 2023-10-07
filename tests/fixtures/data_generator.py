@@ -16,7 +16,7 @@ def generate_random_dna_sequence(length):
 
 sequences = [SeqRecord(Seq(generate_random_dna_sequence(sequence_length)), id=f"DNA_{i+1}") for i in range(num_sequences)]
 
-output_file = "tests/fixtures/random_dna.fasta"
+output_file = "tests/fixtures/invalid.fasta"
 
 with open(output_file, "w") as f:
     SeqIO.write(sequences, f, "fasta")

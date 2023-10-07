@@ -2,7 +2,6 @@ import pytest
 import os
 from genesys.DNAToolKit import *
 
-# Define the path to the test FASTA files
 TEST_DATA_DIR = "tests/fixtures"
 
 def test_sequence_type_DNA():

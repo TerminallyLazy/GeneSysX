@@ -1,11 +1,10 @@
-import random
 import collections
-import json
 from Bio import Phylo, SeqIO
 from Bio.SeqUtils.ProtParam import molecular_weight
 from Bio.Seq import Seq
 from Bio.SeqUtils import gc_fraction
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
+from Bio import Restriction
 from Bio.Align import MultipleSeqAlignment
 from Bio import AlignIO
 from io import StringIO
@@ -58,17 +57,20 @@ def sequence_type(filepath):
     Args:
         filepath (str): Path to the FASTA file.
     """
+    try:
+        with open(filepath, "r") as f:
+            for seq in SeqIO.parse(f, "fasta"):
+                seq_str = str(seq.seq)
+                if set(seq_str.upper()) <= set("ATGC"):
+                    return "DNA"
+                elif set(seq_str.upper()) <= set("AUGC"):
+                    return "RNA"
+                elif set(seq_str.upper()) <= set("ARNDCEQGHILKMFPSTWYV"):
+                    return "Protein"
+        return "Unknown sequence type"
+    except FileNotFoundError:
+        return f"File not found: {filepath}"
 
-    with open(filepath, "r") as f:
-        for seq in SeqIO.parse(f, "fasta"):
-            seq_str = str(seq.seq)
-            if set(seq_str.upper()) <= set("ATGC"):
-                return "DNA"
-            elif set(seq_str.upper()) <= set("AUGC"):
-                return "RNA"
-            elif set(seq_str.upper()) <= set("ARNDCEQGHILKMFPSTWYV"):
-                return "Protein"
-    return "Unknown sequence type"
     
 
 def count_occurences(filepath):
@@ -236,30 +238,72 @@ def mass_calculator(filepath):
 def open_reading_frames(filepath):
     pass
 
-def restriction_sites(dna):
-    reverse_palindromes = []
+def find_recognition_sites(dna_sequence, enzyme_name):
+    sequence = Seq(dna_sequence)
+    enzyme = getattr(Restriction, enzyme_name, None)
     
-    for length in range(4, 13):
-        for i in range(len(dna) - length + 1):
-            subsequence = dna[i:i+length]
-            complement = reverseComplementary(subsequence)
-            
-            if subsequence == complement:
-                reverse_palindromes.append(subsequence)
+    if enzyme is None:
+        raise ValueError(f"Enzyme '{enzyme_name}' not found in Biopython's Restriction module.")
 
-    reverse_palindromes_str = ', '.join(reverse_palindromes)
+    cut_sites = enzyme.search(sequence)
+
+    recognition_sites = [(site, sequence[site:site + len(enzyme.site)]) for site in cut_sites]
+    return recognition_sites
+
+def find_print_recognition_sites(filepath):
+    enzyme_names = ["EcoRI", "HindIII", "BamHI", "XhoI", "NotI", "SalI", "EcoRV", "PstI", "KpnI", "SmaI"]
+
+    sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
+    result = {}
+
+    for seq_id, seq_record in sequences.items():
+        dna_sequence = str(seq_record.seq)
+        enzyme_sites = {}
+        for enzyme_name in enzyme_names:
+            sites = find_recognition_sites(dna_sequence, enzyme_name)
+            if sites:
+                enzyme_sites[enzyme_name] = sites
+        if enzyme_sites:
+            result[seq_id] = enzyme_sites
+
+    for seq_id, enzyme_sites in result.items():
+        print(f"Recognition sites for sequence {seq_id}:")
+        for enzyme_name, seq_sites in enzyme_sites.items():
+            print(f"  Enzyme: {enzyme_name}")
+            for site, site_seq in seq_sites:
+                print(f"    Position {site}: {site_seq}")
+
+
+
+def multiple_sequence_alignment(filepath):
+    """
+    Perform multiple sequence alignment on a FASTA file.
+
+    Parameters:
+    - filepath: Path to the FASTA file containing the sequences to align.
+
+    Returns:
+    - A MultipleSeqAlignment object containing the aligned sequences.
+    """
+    with open(filepath, "r") as text_file:
+        alignment = AlignIO.read(text_file, "fasta")
     
-    return reverse_palindromes_str
-
-
-def multiple_sequence_alignment(dna):
-    text_file = StringIO(dna)
-    alignment = AlignIO.read(text_file, "fasta")
     aligned_seqs = MultipleSeqAlignment(alignment)
 
-    return str(aligned_seqs)
+    return aligned_seqs
 
-def construct_phylogenetic_tree(aligned_seqs):
+def construct_phylogenetic_tree(filepath):
+    """
+    Construct a phylogenetic tree from a FASTA file.
+
+    Parameters:
+    - filepath: Path to the FASTA file containing the sequences to align.
+
+    Returns:
+    - A Phylo.Tree object representing the phylogenetic tree.
+    """
+
+    aligned_seqs = multiple_sequence_alignment(filepath)
     calculator = DistanceCalculator("identity")
     constructor = DistanceTreeConstructor(calculator)
     tree = constructor.build_tree(aligned_seqs)
@@ -271,6 +315,7 @@ def construct_phylogenetic_tree(aligned_seqs):
     
     return tree
 
+# REVISIT THIS FUNCTION WITH CHARLIE
 def detect_snps(seq1, seq2):
     """
     Detect singular nucleotide polymorphisms (SNPs) between two DNA sequences.
@@ -291,4 +336,4 @@ def detect_snps(seq1, seq2):
 
     return snps
 
-print(open_reading_frames("tests/fixtures/sequence.fasta"))
+print(construct_phylogenetic_tree("tests/fixtures/msa.fasta"))

@@ -55,7 +55,7 @@ def count_occurences(filepath):
         seq_str = str(seq.seq)
         ret[seq_id] = collections.Counter(seq_str)
 
-    return ret
+    return str(ret)
 
 # Gives the complementary DNA sequence to a given DNA seq
 
@@ -75,7 +75,7 @@ def transcription(filepath):
         seq_str = str(seq.seq)
         ret[seq_id] = seq_str.replace("T", "U")
 
-    return ret
+    return str(ret)
 
 # Transcripts a given DNA sequence (gives the RNA version)
 
@@ -156,7 +156,7 @@ def translation(filepath):
         translated_sequence = str(sequence.translate())
         translated_sequences[seq_id] = translated_sequence
 
-    return translated_sequences
+    return str(translated_sequences)
 
 
 def find_invalid_amino_acid(sequence):
@@ -310,3 +310,5 @@ def detect_snps(seq1, seq2):
 
     return snps
 
+
+#print(transcription("tests/fixtures/random_dna.fasta"))

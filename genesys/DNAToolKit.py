@@ -307,6 +307,3 @@ def detect_snps(seq1, seq2):
             for i in range(len(seq1)) if seq1[i] != seq2[i]]
 
     return snps
-
-
-print(mass_calculator("tests/fixtures/msa.fasta"))

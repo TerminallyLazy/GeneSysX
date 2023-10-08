@@ -7,7 +7,6 @@ from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstruct
 from Bio import Restriction
 from Bio.Align import MultipleSeqAlignment
 from Bio import AlignIO
-from io import StringIO
 import matplotlib.pyplot as plt
 
 
@@ -19,15 +18,18 @@ def sequence_type(filepath):
     """
     try:
         with open(filepath, "r") as f:
-            for seq in SeqIO.parse(f, "fasta"):
-                seq_str = str(seq.seq)
-                if set(seq_str.upper()) <= set("ATGC"):
-                    return "DNA"
-                elif set(seq_str.upper()) <= set("AUGC"):
-                    return "RNA"
-                elif set(seq_str.upper()) <= set("ARNDCEQGHILKMFPSTWYV"):
-                    return "Protein"
-        return "Unknown sequence type"
+            first = list(SeqIO.parse(f, "fasta"))[0]
+            seq = str(first.seq)
+
+            if set(seq.upper()) <= set("ATGC"):
+                return "DNA"
+            elif set(seq.upper()) <= set("AUGC"):
+                return "RNA"
+            elif set(seq.upper()) <= set("ARNDCEQGHILKMFPSTWYV"):
+                return "Protein"
+            else:
+                return "Invalid"
+
     except FileNotFoundError:
         return f"File not found: {filepath}"
 

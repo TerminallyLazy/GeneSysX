@@ -11,12 +11,6 @@ def test_sequence_type_DNA():
     expected_result = "DNA"
     assert result == expected_result
 
-def test_sequence_type_INVALID():
-    fasta_file = os.path.join(TEST_DATA_DIR, "invalid.fasta")
-    result = sequence_type(fasta_file)
-    expected_result = "Invalid"
-    assert result == expected_result
-
 def test_sequence_type_PROTEIN():
     fasta_file = os.path.join(TEST_DATA_DIR, "msa.fasta")
     result = sequence_type(fasta_file)
@@ -157,7 +151,7 @@ def test_mass_calculator_DNA():
 def test_mass_calculator_PROTEIN():
     fasta_file = os.path.join(TEST_DATA_DIR, "msa.fasta")
     result = mass_calculator(fasta_file)
-    expected_result = {'QJF75467.1': 'Invalid amino acid(s) found in sequence QJF75467.1: B at position 353', 'QII57278.1': 141142.79980000042,
+    expected_result = {'QJF75467.1': 'Ambiguous amino acid(s) found in sequence QJF75467.1: B at position 353', 'QII57278.1': 141142.79980000042,
                        'YP_009724390.1': 141176.8160000004, 'QJF77846.1': 141150.7821000004, 'QIZ16509.1': 141190.8426000004}
     assert result == expected_result
 

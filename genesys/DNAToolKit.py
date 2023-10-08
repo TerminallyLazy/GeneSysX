@@ -25,10 +25,8 @@ def sequence_type(filepath):
                 return "DNA"
             elif set(seq.upper()) <= set("AUGC"):
                 return "RNA"
-            elif set(seq.upper()) <= set("ARNDCEQGHILKMFPSTWYV"):
-                return "Protein"
             else:
-                return "Invalid"
+                return "Protein"
 
     except FileNotFoundError:
         return f"File not found: {filepath}"
@@ -192,7 +190,7 @@ def mass_calculator(filepath):
             elif seq_type == "Protein":
                 invalid_positions = find_invalid_amino_acid(sequence)
                 if invalid_positions:
-                    error_message = f"Invalid amino acid(s) found in sequence {seq_id}: {', '.join(f'{aa} at position {pos}' for aa, pos in invalid_positions)}"
+                    error_message = f"Ambiguous amino acid(s) found in sequence {seq_id}: {', '.join(f'{aa} at position {pos}' for aa, pos in invalid_positions)}"
                     raise ValueError(error_message)
                 masses[seq_id] = molecular_weight(sequence, "protein")
         except ValueError as e:
@@ -311,4 +309,4 @@ def detect_snps(seq1, seq2):
     return snps
 
 
-#print(transcription("tests/fixtures/random_dna.fasta"))
+print(mass_calculator("tests/fixtures/msa.fasta"))

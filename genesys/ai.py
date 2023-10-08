@@ -64,16 +64,21 @@ def run_conversation(user_input, fasta_file):
                 },
                 "required": ["filepath"]
             },
-            #"returns": {
-            #    "type": "object",
-            #    "properties": {
-            #        "dict": {
-            #            "type": "object",
-            #            "description": "A dictionary where keys are sequence IDs"
-            #            },
-            #        }
-            #    },
+        },
+        {
+            "name": "transcription",
+            "description": "Transcribe a DNA sequence to RNA.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to the FASTA file."
+                    },
+                },
+                "required": ["filepath"]
             },
+        }
 
     ]
 
@@ -96,6 +101,7 @@ def run_conversation(user_input, fasta_file):
         available_functions = {
             "sequence_type": sequence_type,
             "count_occurences": count_occurences,
+            "transcription": transcription,
         }
 
         function_name = response_message["function_call"]["name"]
@@ -110,6 +116,10 @@ def run_conversation(user_input, fasta_file):
                         filepath=function_args.get("filepath"),
                     )
                 elif function_name == "count_occurences":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "transcription":
                     function_response = function_to_call(
                         filepath=function_args.get("filepath"),
                     )
@@ -143,5 +153,5 @@ def run_conversation(user_input, fasta_file):
     return answer
 
 
-print(run_conversation("what are the number of occurences in the given?",
-      "tests/fixtures/msa.fasta"))
+print(run_conversation("what is the mRNA transcript for the first sequence?",
+      "tests/fixtures/random_dna.fasta"))

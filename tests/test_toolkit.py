@@ -13,9 +13,9 @@ def test_sequence_type_DNA():
 
 def test_sequence_type_INVALID():
     fasta_file = os.path.join(TEST_DATA_DIR, "invalid.fasta")
-    with pytest.raises(ValueError, match="Unknown sequence type"):
-        sequence_type(fasta_file)
-
+    result = sequence_type(fasta_file)
+    expected_result = "Invalid"
+    assert result == expected_result
 
 def test_sequence_type_PROTEIN():
     fasta_file = os.path.join(TEST_DATA_DIR, "msa.fasta")

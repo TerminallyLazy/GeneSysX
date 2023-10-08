@@ -78,6 +78,20 @@ def run_conversation(user_input, fasta_file):
                 },
                 "required": ["filepath"]
             },
+        },
+        {
+            "name": "complementary",
+            "description": "Find the complementary DNA sequence to a given DNA sequence.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to the FASTA file."
+                    },
+                },
+                "required": ["filepath"]
+            },
         }
 
     ]
@@ -102,6 +116,7 @@ def run_conversation(user_input, fasta_file):
             "sequence_type": sequence_type,
             "count_occurences": count_occurences,
             "transcription": transcription,
+            "complementary": complementary,
         }
 
         function_name = response_message["function_call"]["name"]
@@ -120,6 +135,10 @@ def run_conversation(user_input, fasta_file):
                         filepath=function_args.get("filepath"),
                     )
                 elif function_name == "transcription":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "complementary":
                     function_response = function_to_call(
                         filepath=function_args.get("filepath"),
                     )
@@ -153,5 +172,5 @@ def run_conversation(user_input, fasta_file):
     return answer
 
 
-print(run_conversation("what is the mRNA transcript for the first sequence?",
+print(run_conversation("what is the complementary seq for the first sequence?",
       "tests/fixtures/random_dna.fasta"))

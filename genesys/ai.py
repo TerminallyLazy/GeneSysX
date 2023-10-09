@@ -1,7 +1,7 @@
 import os
 import json
 import openai
-
+from protein_render import *
 from DNAToolKit import *
 from env import load_dotenv
 
@@ -163,6 +163,39 @@ def run_conversation(user_input, fasta_file):
                 "required": ["filepath"]
             },
         },
+        {
+            "name": "isoelectric_point",
+            "description": "Calculate the isoelectric point of a protein sequence.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filepath": {
+                        "type": "string",
+                        "description": "The protein sequence."
+                    },
+                },
+                "required": ["filepath"]
+            },
+        },
+        {
+            "name": "render_protein_file",
+            "description": "Renders a 3D protein file.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "pdb_file_content": {
+                        "type": "string",
+                        "description": "The content of the PDB file to render in 3D."
+                    },
+                    "style": {
+                        "type": "string",
+                        "description": "The style to apply to the protein rendering (e.g., 'cartoon').",
+                        "default": "cartoon"
+                    },
+                },
+                "required": ["pdb_file_content"]
+            }
+        }
 
     ]
 
@@ -191,7 +224,9 @@ def run_conversation(user_input, fasta_file):
             "gc_content": gc_content,
             "translation": translation,
             "mass_calculator": mass_calculator,
-            "restriction_sites": restriction_sites
+            "restriction_sites": restriction_sites,
+            "isoelectric_point": isoelectric_point,
+            "render_protein_file": render_protein_file,
         }
 
         function_name = response_message["function_call"]["name"]
@@ -237,6 +272,14 @@ def run_conversation(user_input, fasta_file):
                     function_response = function_to_call(
                         filepath=function_args.get("filepath"),
                     )
+                elif function_name == "isoelectric_point":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "render_protein_file":
+                    function_response = function_to_call(
+                        pdb_file_content=function_args.get("pdb_file_content"),
+                    )
                 else:
                     # Add handling for other functions if needed
                     pass
@@ -267,4 +310,5 @@ def run_conversation(user_input, fasta_file):
     return answer
 
 
-
+print(run_conversation("What are the isoelectric points?",
+      "tests/fixtures/sequence.fasta"))

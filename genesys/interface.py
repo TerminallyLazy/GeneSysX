@@ -82,11 +82,18 @@ if authentication_status:
     st.sidebar.title(f"Welcome {name}")
     st.sidebar.write("GeneSys AI is your all-in-one genomics and bioinformatics companion, designed to empower a wide range of users, from bioinformaticians and researchers to clinicians and students.")
 
+    st.sidebar.title(f"Instructions")
+    st.sidebar.write(
+        """
+        1. Upload file.
+        2. Ask a question about your data.
+        3. Get an answer.
+    """
+    )
     logging.basicConfig(
         format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
     load_dotenv()
 
-    # TODO: We don't need this: We can just have them upload any file instead catch the file type and ask them what we would like them to do. We should aim to have minimize customer interactions until they have what they need.
     def determine_file_type(file):
         if file is not None:
             file_extension = file.name.split('.')[-1].lower()
@@ -105,7 +112,7 @@ if authentication_status:
     if data_type:
         st.write(f"I detected a {data_type} file, what would you like to do?")
     else:
-        st.write("Please upload a file to determine its type.")
+        st.write("Uplod a file to get started.")
     # Another reason we don't want this to be our implementation is we are going to hopefully have 10 --> 20 file types in the future. Which will be a lot of ifs.
 
     if data_type == "FASTA":
@@ -117,8 +124,7 @@ if authentication_status:
                 with open(temp_file_path, "wb") as temp_file:
                     temp_file.write(fasta_file.read())
 
-                st.success(
-                    f"File uploaded successfully. File path: {temp_file_path}")
+                st.success(f"File uploaded successfully!")
 
         if fasta_file is not None:
 
@@ -140,7 +146,10 @@ if authentication_status:
             url = get_s3_url(filename=pdb_file.name)
             upload_content_to_s3(url, pdb_content)
 
-            render_protein_file(pdb_content)
+            user_input = st.text_input("Enter some text:")
+
+            if st.button("Submit"):
+                st.write(render_protein_file(pdb_content))
 
         else:
             st.write("Please upload a PDB file.")

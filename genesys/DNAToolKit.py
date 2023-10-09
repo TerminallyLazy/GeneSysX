@@ -184,7 +184,7 @@ def mass_calculator(filepath):
 
         try:
             if seq_type == "DNA":
-                masses[seq_id] = molecular_weight(sequence)
+                masses[seq_id] = molecular_weight(sequence, "DNA")
             elif seq_type == "RNA":
                 masses[seq_id] = molecular_weight(sequence, "RNA")
             elif seq_type == "Protein":

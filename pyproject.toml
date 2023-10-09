@@ -19,6 +19,7 @@ stmol = "^0.0.9"
 ipython-genutils = "^0.2.0"
 httpx = "^0.25.0"
 streamlit-authenticator = "0.1.5"
+primer3-py = "^2.0.1"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -2716,6 +2716,29 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "primer3-py"
+version = "2.0.1"
+description = "Python bindings for Primer3"
+optional = false
+python-versions = "*"
+files = [
+    {file = "primer3-py-2.0.1.tar.gz", hash = "sha256:30b549c568ae5712e3e6cde6c1f5b243f328247ec8d6ec89d4b705873a44e772"},
+    {file = "primer3_py-2.0.1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:137027065ed48406c6dcf0071169c3bb7cd1118f57edc04cd45340c2e26f1cbb"},
+    {file = "primer3_py-2.0.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:87269d19b0952e8e77ba8dccb2a9a04d02a534ec83f9371393287c36528b5a34"},
+    {file = "primer3_py-2.0.1-cp310-cp310-win_amd64.whl", hash = "sha256:a10913d23b93342b2582d54d3a1dfa93a9758aba49466a186cfe51d7ce4e2174"},
+    {file = "primer3_py-2.0.1-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:f42a0c3607ffe2639439e440228630914c54a9f0e64e715fb49d701535fac2bf"},
+    {file = "primer3_py-2.0.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8130405c07cf406f34aeee099388248faef099ba43e09b763c54cb5bc9c1d6a9"},
+    {file = "primer3_py-2.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:b23a22e02666d78d4dd0fc10c45c8155413e4ef14791f74228dd340d6a0da3da"},
+    {file = "primer3_py-2.0.1-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:611de7d1a4b2dfcae02050504aa1263610172b3275d53ab3ba2013be29070d96"},
+    {file = "primer3_py-2.0.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1b8f81b7e7067602302843f0a6d3f6967e51f3ac4c597feb16ea9b423a90f0ef"},
+    {file = "primer3_py-2.0.1-cp38-cp38-win_amd64.whl", hash = "sha256:eb352320cd883a402685b5fe72228401d9017785d4beabe83e6236deb82dc678"},
+    {file = "primer3_py-2.0.1-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:d9db447636a330cef9e30444169c67fd5bc5c208d2f0792fce1111380856b7e2"},
+    {file = "primer3_py-2.0.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:af358097f43ef872e2c9e0dc945a4c1f585cdd3638275c733cf827ac98698658"},
+    {file = "primer3_py-2.0.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5a6921b38e6db231b9842f41306c5703ffef4410d41fbe287de8acbe6d64c460"},
+    {file = "primer3_py-2.0.1-cp39-cp39-win_amd64.whl", hash = "sha256:7c572eccbcf6fa1336166d936449f7b59341f4c8a3d68011f66ae65d6d4a1b48"},
+]
+
+[[package]]
 name = "prometheus-client"
 version = "0.17.1"
 description = "Python client for the Prometheus monitoring system."
@@ -4272,4 +4295,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "4f30ccddb69ce38a26297e4320bbf7fe69fc1b431a8ece73c351a4262e30c02a"
+content-hash = "d3a4166d3b5946979f97a56f4bdf4d2a02e562ee0d68c5c8e9e2884ebb06821a"

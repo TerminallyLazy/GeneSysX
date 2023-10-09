@@ -1,9 +1,9 @@
 import os
 import json
 import openai
-from protein_render import *
-from DNAToolKit import *
-from env import load_dotenv
+from .protein_render import *
+from .DNAToolKit import *
+from .env import load_dotenv
 
 load_dotenv()
 

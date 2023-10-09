@@ -9,13 +9,185 @@ load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+system_prompt = "Be a bioinformatician who answers questions about a FASTA file with the given path."
+
+functions = [
+    {
+        "name": "sequence_type",
+        "description": "Get the type of sequences in a FASTA file.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                }
+            },
+            "required": ["filepath"]
+        },
+        "returns": {
+            "type": "object",
+            "properties": {
+                "sequence_type": {
+                    "type": "string",
+                    "enum": ["DNA", "RNA", "Protein"],
+                }
+            },
+        }
+    },
+    {
+        "name": "count_occurences",
+        "description": "Count the number of nucleotides for each DNA/RNA sequence or amino acids for each protein in a FASTA file",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "transcription",
+        "description": "Transcribe a DNA sequence to RNA.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "complementary",
+        "description": "Find the complementary DNA sequence to a given DNA sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "reverseComplementary",
+        "description": "Find the reverse complementary DNA sequence to a given DNA sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "gc_content",
+        "description": "Calculate the GC content of a DNA/RNA sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "translation",
+        "description": "Translate a DNA sequence to a protein sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "mass_calculator",
+        "description": "Calculate the molecular mass of a DNA, RNA or protein sequence",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "restriction_sites",
+        "description": "Find the restriction sites of a DNA sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "isoelectric_point",
+        "description": "Calculate the isoelectric point of a protein sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "The protein sequence."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "render_protein_file",
+        "description": "Renders a 3D protein file.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "pdb_file_content": {
+                    "type": "string",
+                    "description": "The content of the PDB file to render in 3D."
+                },
+                "style": {
+                    "type": "string",
+                    "description": "The style to apply to the protein rendering (e.g., 'cartoon').",
+                    "default": "cartoon"
+                },
+            },
+            "required": ["pdb_file_content"]
+        }
+    }
+]
 
 def run_conversation(user_input, fasta_file):
     # Step 1: Send the user query and available functions to GPT-3.5 Turbo
     messages = [
         {
             "role": "system",
-            "content": "Be a bioinformatician who answers questions about a FASTA file with the given path."
+            "content": system_prompt
         },
         {
             "role": "user",
@@ -27,178 +199,7 @@ def run_conversation(user_input, fasta_file):
         }
     ]
 
-    functions = [
-        {
-            "name": "sequence_type",
-            "description": "Get the type of sequences in a FASTA file.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "Path to the FASTA file."
-                    }
-                },
-                "required": ["filepath"]
-            },
-            "returns": {
-                "type": "object",
-                "properties": {
-                    "sequence_type": {
-                        "type": "string",
-                        "enum": ["DNA", "RNA", "Protein"],
-                    }
-                },
-            }
-        },
-        {
-            "name": "count_occurences",
-            "description": "Count the number of nucleotides for each DNA/RNA sequence or amino acids for each protein in a FASTA file",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "Path to the FASTA file."
-                    },
-                },
-                "required": ["filepath"]
-            },
-        },
-        {
-            "name": "transcription",
-            "description": "Transcribe a DNA sequence to RNA.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "Path to the FASTA file."
-                    },
-                },
-                "required": ["filepath"]
-            },
-        },
-        {
-            "name": "complementary",
-            "description": "Find the complementary DNA sequence to a given DNA sequence.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "Path to the FASTA file."
-                    },
-                },
-                "required": ["filepath"]
-            },
-        },
-        {
-            "name": "reverseComplementary",
-            "description": "Find the reverse complementary DNA sequence to a given DNA sequence.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "Path to the FASTA file."
-                    },
-                },
-                "required": ["filepath"]
-            },
-        },
-        {
-            "name": "gc_content",
-            "description": "Calculate the GC content of a DNA/RNA sequence.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "Path to the FASTA file."
-                    },
-                },
-                "required": ["filepath"]
-            },
-        },
-        {
-            "name": "translation",
-            "description": "Translate a DNA sequence to a protein sequence.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "Path to the FASTA file."
-                    },
-                },
-                "required": ["filepath"]
-            },
-        },
-        {
-            "name": "mass_calculator",
-            "description": "Calculate the molecular mass of a DNA, RNA or protein sequence",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "Path to the FASTA file."
-                    },
-                },
-                "required": ["filepath"]
-            },
-        },
-        {
-            "name": "restriction_sites",
-            "description": "Find the restriction sites of a DNA sequence.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "Path to the FASTA file."
-                    },
-                },
-                "required": ["filepath"]
-            },
-        },
-        {
-            "name": "isoelectric_point",
-            "description": "Calculate the isoelectric point of a protein sequence.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filepath": {
-                        "type": "string",
-                        "description": "The protein sequence."
-                    },
-                },
-                "required": ["filepath"]
-            },
-        },
-        {
-            "name": "render_protein_file",
-            "description": "Renders a 3D protein file.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "pdb_file_content": {
-                        "type": "string",
-                        "description": "The content of the PDB file to render in 3D."
-                    },
-                    "style": {
-                        "type": "string",
-                        "description": "The style to apply to the protein rendering (e.g., 'cartoon').",
-                        "default": "cartoon"
-                    },
-                },
-                "required": ["pdb_file_content"]
-            }
-        }
-
-    ]
-
+    # TODO: extract chat completion options
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo-0613",
         messages=messages,

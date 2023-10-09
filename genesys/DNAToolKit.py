@@ -3,6 +3,7 @@ from Bio import Phylo, SeqIO
 from Bio.SeqUtils.ProtParam import molecular_weight
 from Bio.Seq import Seq
 from Bio.SeqUtils import gc_fraction
+from Bio.SeqUtils.IsoelectricPoint import IsoelectricPoint as IP
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from Bio import Restriction
 from Bio.Align import MultipleSeqAlignment
@@ -242,6 +243,23 @@ def restriction_sites(filepath):
 
     return result
 
+def isoelectric_point(filepath):
+
+    sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
+    isoelectric_points = {}
+
+    for seq_id, seq_record in sequences.items():
+        sequence = seq_record.seq
+        seq_type = sequence_type(filepath)
+
+        if seq_type == "Protein":
+            isoelectric_points[seq_id] = IP(sequence).pi()
+        elif seq_type == "DNA":
+            isoelectric_points[seq_id] = IP(sequence.translate()).pi()
+        elif seq_type == "RNA":
+            isoelectric_points[seq_id] = IP(sequence.translate()).pi()
+        
+    return isoelectric_points
 
 def multiple_sequence_alignment(filepath):
     """
@@ -307,3 +325,5 @@ def detect_snps(seq1, seq2):
             for i in range(len(seq1)) if seq1[i] != seq2[i]]
 
     return snps
+
+print(isoelectric_point("tests/fixtures/random_rna.fasta"))

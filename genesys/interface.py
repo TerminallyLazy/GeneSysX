@@ -31,7 +31,43 @@ file_path = Path(__file__).parent / "hashed_pw.pkl"
 with file_path.open("rb") as file:
     hashed_passwords = pickle.load(file)
 
-authenticator = stauth.Authenticate(names, usernames, hashed_passwords, "sales_dashboard", "abcdef", cookie_expiry_days=0)
+authenticator = stauth.Authenticate(
+    names, usernames, hashed_passwords, "sales_dashboard", "abcdef", cookie_expiry_days=0)
+
+header = """
+<div class="fade-in" style='text-align: center;'>
+    <h1>🧬 GeneSys AI 🧬</h1>
+</div>
+"""
+
+subheader = """
+<div class="fade-in" style='text-align: center;'>
+    <p><em>Making it as easy as AUG</em></p>
+</div>
+"""
+
+# Inject custom CSS and content
+st.markdown(
+    f"""
+    <style>
+        .fade-in {{
+            opacity: 0;
+            animation: fade-in 1s ease-in-out forwards;
+        }}
+        @keyframes fade-in {{
+            0% {{
+                opacity: 0;
+            }}
+            100% {{
+                opacity: 1;
+            }}
+        }}
+    </style>
+    {header}
+    {subheader}
+    """,
+    unsafe_allow_html=True,
+)
 
 name, authentication_status, username = authenticator.login("Login", "main")
 
@@ -46,41 +82,58 @@ if authentication_status:
     st.sidebar.title(f"Welcome {name}")
     st.sidebar.write("GeneSys AI is your all-in-one genomics and bioinformatics companion, designed to empower a wide range of users, from bioinformaticians and researchers to clinicians and students.")
 
-    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+    logging.basicConfig(
+        format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
     load_dotenv()
 
-    st.title("🧬 GeneSys AI 🧬") # TODO: Center this.
+    # TODO: We don't need this: We can just have them upload any file instead catch the file type and ask them what we would like them to do. We should aim to have minimize customer interactions until they have what they need.
+    def determine_file_type(file):
+        if file is not None:
+            file_extension = file.name.split('.')[-1].lower()
+            if file_extension == "fasta":
+                return "FASTA"
+            elif file_extension == "csv":
+                return "CSV"
+            elif file_extension == "pdb":
+                return "PDB"
+        return None
 
-    data_type = st.radio("Select the type of data to upload:", ["FASTA", "CSV", "PDF", "PDB"]) # TODO: We don't need this: We can just have them upload any file instead catch the file type and ask them what we would like them to do. We should aim to have minimize customer interactions until they have what they need.
+    file = st.file_uploader("Drop a file here")
+
+    data_type = determine_file_type(file)
+
+    if data_type:
+        st.write(f"I detected a {data_type} file, what would you like to do?")
+    else:
+        st.write("Please upload a file to determine its type.")
     # Another reason we don't want this to be our implementation is we are going to hopefully have 10 --> 20 file types in the future. Which will be a lot of ifs.
-
 
     if data_type == "FASTA":
         if data_type == "FASTA":
-            fasta_file = st.file_uploader("Upload a FASTA file", type=["fasta", "fa", "txt"])
-            
+            fasta_file = file
+
             if fasta_file is not None:
                 temp_file_path = os.path.join("/tmp", fasta_file.name)
                 with open(temp_file_path, "wb") as temp_file:
                     temp_file.write(fasta_file.read())
-                
-                # Now, temp_file_path contains the file path to the uploaded file
-                st.success(f"File uploaded successfully. File path: {temp_file_path}")
+
+                st.success(
+                    f"File uploaded successfully. File path: {temp_file_path}")
 
         if fasta_file is not None:
 
-            #url = get_s3_url(filename=fasta_file.name)
-            #upload_content_to_s3(url, fasta_content)
+            # url = get_s3_url(filename=fasta_file.name)
+            # upload_content_to_s3(url, fasta_content)
 
             user_input = st.text_input("Enter some text:")
 
-            if st.button("Submit"): 
+            if st.button("Submit"):
                 st.write(run_conversation(user_input, temp_file_path))
         else:
             st.write("Please upload a FASTA file.")
 
-    elif data_type == "PDB": 
-        pdb_file = st.file_uploader("Upload a FASTA file", type=["pdb" , "txt"])
+    elif data_type == "PDB":
+        pdb_file = file
 
         if pdb_file is not None:
             pdb_content = pdb_file.read().decode("utf-8")
@@ -90,10 +143,10 @@ if authentication_status:
             render_protein_file(pdb_content)
 
         else:
-            st.write("Please upload a FASTA file.")
+            st.write("Please upload a PDB file.")
 
     elif data_type == "CSV":
-        csv_file = st.file_uploader("Upload a CSV file", type=["csv", "txt"])
+        csv_file = file
 
         if csv_file is not None:
             st.write("CSV file uploaded. Displaying DataFrame:")
@@ -109,7 +162,8 @@ if authentication_status:
 
             user_input = st.text_input("What is your request?")
 
-            url = get_s3_url(filename=f"ChatSession/query-{str(int(time()))}.txt")
+            url = get_s3_url(
+                filename=f"ChatSession/query-{str(int(time()))}.txt")
             upload_content_to_s3(url, user_input)
 
             if user_input:
@@ -122,19 +176,11 @@ if authentication_status:
                 st.write(response)
 
                 if response == None:
-                    st.image("exports/charts/temp_chart.png", caption="Chart Image", use_column_width=True)
-
+                    st.image("exports/charts/temp_chart.png",
+                             caption="Chart Image", use_column_width=True)
 
         if st.button("Submit"):
             df_json = df.to_json(orient="split")
             st.write(run_conversation(user_input, df_json))
         else:
-            st.write("Please upload a FASTA file.")
-
-    elif data_type == "PDF":
-        pdf_file = st.file_uploader("Upload a PDF file", type=["pdf"])
-
-        if pdf_file is not None:
-            st.write("PDF file uploaded. Add your processing logic.")
-            # url = get_s3_url(pdf_file)
-            # upload_content_to_s3(url, pdf_content.name)
+            st.write("Please upload a CSV file.")

@@ -1,3 +1,8 @@
+"""
+This testing module is to make sure that the prompts and the function
+descriptions defined in `genesys.ai` results in the behavior that we expect.
+"""
+
 import os
 import openai
 from genesys import ai

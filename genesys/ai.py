@@ -92,7 +92,77 @@ def run_conversation(user_input, fasta_file):
                 },
                 "required": ["filepath"]
             },
-        }
+        },
+        {
+            "name": "reverseComplementary",
+            "description": "Find the reverse complementary DNA sequence to a given DNA sequence.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to the FASTA file."
+                    },
+                },
+                "required": ["filepath"]
+            },
+        },
+        {
+            "name": "gc_content",
+            "description": "Calculate the GC content of a DNA/RNA sequence.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to the FASTA file."
+                    },
+                },
+                "required": ["filepath"]
+            },
+        },
+        {
+            "name": "translation",
+            "description": "Translate a DNA sequence to a protein sequence.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to the FASTA file."
+                    },
+                },
+                "required": ["filepath"]
+            },
+        },
+        {
+            "name": "mass_calculator",
+            "description": "Calculate the molecular mass of a DNA, RNA or protein sequence",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to the FASTA file."
+                    },
+                },
+                "required": ["filepath"]
+            },
+        },
+        {
+            "name": "restriction_sites",
+            "description": "Find the restriction sites of a DNA sequence.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filepath": {
+                        "type": "string",
+                        "description": "Path to the FASTA file."
+                    },
+                },
+                "required": ["filepath"]
+            },
+        },
 
     ]
 
@@ -117,6 +187,11 @@ def run_conversation(user_input, fasta_file):
             "count_occurences": count_occurences,
             "transcription": transcription,
             "complementary": complementary,
+            "reverseComplementary": reverseComplementary,
+            "gc_content": gc_content,
+            "translation": translation,
+            "mass_calculator": mass_calculator,
+            "restriction_sites": restriction_sites
         }
 
         function_name = response_message["function_call"]["name"]
@@ -139,6 +214,26 @@ def run_conversation(user_input, fasta_file):
                         filepath=function_args.get("filepath"),
                     )
                 elif function_name == "complementary":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "reverseComplementary":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "gc_content":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "translation":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "mass_calculator":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "restriction_sites":
                     function_response = function_to_call(
                         filepath=function_args.get("filepath"),
                     )
@@ -172,5 +267,4 @@ def run_conversation(user_input, fasta_file):
     return answer
 
 
-print(run_conversation("what is the complementary seq for the first sequence?",
-      "tests/fixtures/random_dna.fasta"))
+

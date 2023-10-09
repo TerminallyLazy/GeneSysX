@@ -40,4 +40,11 @@ def test_ask_sequence_type():
     assert response_message["function_call"]["name"] == "sequence_type"
 
 def test_ask_count_nucleotides():
-    pass
+    response = question_about_file(
+        "How many nucleotides are in the first sequence?",
+        os.path.join(TEST_DATA_DIR, "sequence.fasta")
+    )
+    response_message = response["choices"][0]["message"]
+    assert response_message.get("function_call")
+    assert response_message["function_call"]["name"] == "count_occurences"
+

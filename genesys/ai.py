@@ -308,7 +308,3 @@ def run_conversation(user_input, fasta_file):
     answer = second_response["choices"][0]["message"]["content"]
 
     return answer
-
-
-print(run_conversation("What are the isoelectric points?",
-      "tests/fixtures/sequence.fasta"))

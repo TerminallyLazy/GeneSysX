@@ -48,3 +48,11 @@ def test_ask_count_nucleotides():
     assert response_message.get("function_call")
     assert response_message["function_call"]["name"] == "count_occurences"
 
+def test_ask_multiple_sequence_alignment():
+    response = question_about_file(
+        "What is the multiple sequence alignment of the sequences?",
+        os.path.join(TEST_DATA_DIR, "msa.fasta")
+    )
+    response_message = response["choices"][0]["message"]
+    assert response_message.get("function_call")
+    assert response_message["function_call"]["name"] == "multiple_sequence_alignment"

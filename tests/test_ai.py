@@ -4,6 +4,7 @@ descriptions defined in `genesys.ai` results in the behavior that we expect.
 """
 
 import os
+import pytest
 import openai
 from genesys import ai
 
@@ -120,3 +121,8 @@ def test_ask_orf():
     response_message = response["choices"][0]["message"]
     assert response_message.get("function_call")
     assert response_message["function_call"]["name"] == "open_reading_frames"
+
+@pytest.mark.skip(reason="used for manual testing")
+def test_run_conversation():
+    filepath = os.path.join(TEST_DATA_DIR, "sequence.fasta")
+    print(ai.run_conversation("What type of sequences are in this file?", filepath))

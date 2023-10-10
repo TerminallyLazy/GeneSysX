@@ -1,233 +1,311 @@
 import os
 import json
 import openai
-
-from DNAToolKit import *
-from env import  load_dotenv
-
+from .protein_render import *
+from .DNAToolKit import *
+from .env import load_dotenv
 
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-def run_conversation(user_input, sequences_as_string):
-    # Step 1: Send the user query and available functions to GPT-3.5 Turbo
-    messages = [{"role": "user", "content": f"Take the user's request {user_input} and perform the respective actions to the following the DNA sequence: {sequences_as_string}"}]
-    
-    functions = [
-        {
-            "name": "countNucleotides",
-            "description": "Count nucleotides in a DNA sequence",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The DNA sequence to count nucleotides",
-                    },
-                },
-                "required": ["dna"],
-            },
-        },
-        {
-            "name": "transcription",
-            "description": "Transcribe an RNA sequence to its complementary DNA sequence",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The DNA sequence to transcribe",
-                    },
-                },
-                "required": ["dna"],
-            },
-        },
-        {
-            "name": "translation",
-            "description": "Translates the sequence to it's protein sequence",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The sequence to be translated",
-                    },
-                },
-                "required": ["dna"],
-            },
-        },
-        {
-            "name": "restriction_sites",
-            "description": "Finds the restriction sites of a given DNA seq",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The DNA sequence to look at",
-                    },
-                },
-                "required": ["dna"],
-            },
-            "returns": {
-                "type": "string",
-                "description": "A string containing the restriction sites found in the DNA sequence.",
-            }
-        },
-        {
-            "name": "protein_mass",
-            "description": "Calculates the protein mass from the protein sequence",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The DNA sequence to look at",
-                    },
-                },
-                "required": ["dna"],
-            },
-            "returns": {
-                "type": "string",
-                "description": "The protein mass found in the DNA sequence.",
-            }
-        },
-        {
-            "name": "open_reading_frames",
-            "description": "Calculates the open reading frames (ORFs) from a given DNA sequence and translates them into protein sequences.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "The DNA sequence to analyze for open reading frames (ORFs).",
-                    }
-                },
-                "required": ["dna"]
-            },
-            "returns": {
-                "type": "object",
-                "description": "An object containing the translated protein sequences derived from the identified open reading frames (ORFs).",
-                "properties": {
-                    "frame1": {
-                        "type": "string",
-                        "description": "The protein sequence translated from the first reading frame.",
-                    },
-                    "frame2": {
-                        "type": "string",
-                        "description": "The protein sequence translated from the second reading frame.",
-                    },
-                    "frame3": {
-                        "type": "string",
-                        "description": "The protein sequence translated from the third reading frame.",
-                    }
-                }
-            }
-        },
-        {
-            "name": "multiple_sequence_alignment",
-            "description": "Performs a multiple sequence alignment (MSA) on the given DNA sequence.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "dna": {
-                        "type": "string",
-                        "description": "A DNA sequence.",
-                    }
-                },
-                "required": ["dna"]
-            },
-            "returns": {
-                "type": "string",
-                "description": "The MSA of the given DNA sequences.",
-            }
-        }
+system_prompt = "Be a bioinformatician who answers questions about a FASTA file with the given path."
 
+functions = [
+    {
+        "name": "sequence_type",
+        "description": "Get the type of sequences in a FASTA file.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                }
+            },
+            "required": ["filepath"]
+        },
+        "returns": {
+            "type": "object",
+            "properties": {
+                "sequence_type": {
+                    "type": "string",
+                    "enum": ["DNA", "RNA", "Protein"],
+                }
+            },
+        }
+    },
+    {
+        "name": "count_occurences",
+        "description": "Count the number of nucleotides for each DNA/RNA sequence or amino acids for each protein in a FASTA file",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "transcription",
+        "description": "Transcribe a DNA sequence to RNA.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "complementary",
+        "description": "Find the complementary DNA sequence to a given DNA sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "reverseComplementary",
+        "description": "Find the reverse complementary DNA sequence to a given DNA sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "gc_content",
+        "description": "Calculate the GC content of a DNA/RNA sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "translation",
+        "description": "Translate a DNA sequence to a protein sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "mass_calculator",
+        "description": "Calculate the molecular mass of a DNA, RNA or protein sequence",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "restriction_sites",
+        "description": "Find the restriction sites of a DNA sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "isoelectric_point",
+        "description": "Calculate the isoelectric point of a protein sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "The protein sequence."
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "render_protein_file",
+        "description": "Renders a 3D protein file.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "pdb_file_content": {
+                    "type": "string",
+                    "description": "The content of the PDB file to render in 3D."
+                },
+                "style": {
+                    "type": "string",
+                    "description": "The style to apply to the protein rendering (e.g., 'cartoon').",
+                    "default": "cartoon"
+                },
+            },
+            "required": ["pdb_file_content"]
+        }
+    }
+]
+
+def run_conversation(user_input, fasta_file):
+    # Step 1: Send the user query and available functions to GPT-3.5 Turbo
+    messages = [
+        {
+            "role": "system",
+            "content": system_prompt
+        },
+        {
+            "role": "user",
+            "content": f"""
+                {user_input}
+
+                '{fasta_file}'
+            """
+        }
     ]
 
+    # TODO: extract chat completion options
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo-0613",
         messages=messages,
         functions=functions,
-        function_call="auto",  # The model decides whether to call a function
+        function_call="auto",  # The model decides whether to call a function,
+        temperature=0.3,
     )
 
     response_message = response["choices"][0]["message"]
+
+    # Initialize function_response with a default value
+    function_response = None
 
     # Step 2: Check if GPT wants to call a function
     if response_message.get("function_call"):
         # Step 3: Call the function based on the model's response
         available_functions = {
+            "sequence_type": sequence_type,
+            "count_occurences": count_occurences,
             "transcription": transcription,
-            "countNucleotides": countNucleotides,
-            "restriction_sites": restriction_sites,
+            "complementary": complementary,
+            "reverseComplementary": reverseComplementary,
+            "gc_content": gc_content,
             "translation": translation,
-            "protein_mass": protein_mass,
-            "open_reading_frames": open_reading_frames,
-            "multiple_sequence_alignment": multiple_sequence_alignment
+            "mass_calculator": mass_calculator,
+            "restriction_sites": restriction_sites,
+            "isoelectric_point": isoelectric_point,
+            "render_protein_file": render_protein_file,
         }
-        
+
         function_name = response_message["function_call"]["name"]
         function_to_call = available_functions.get(function_name)
 
         if function_to_call is not None:
             try:
-                function_args = json.loads(response_message["function_call"]["arguments"])
-                if function_name == "countNucleotides":
+                function_args = json.loads(
+                    response_message["function_call"]["arguments"])
+                if function_name == "sequence_type":
                     function_response = function_to_call(
-                        dna=function_args.get("dna"),
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "count_occurences":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
                     )
                 elif function_name == "transcription":
                     function_response = function_to_call(
-                        dna=function_args.get("dna"),
+                        filepath=function_args.get("filepath"),
                     )
-                elif function_name == "restriction_sites":
+                elif function_name == "complementary":
                     function_response = function_to_call(
-                        dna=function_args.get("dna"),
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "reverseComplementary":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "gc_content":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
                     )
                 elif function_name == "translation":
                     function_response = function_to_call(
-                        dna=function_args.get("dna")
+                        filepath=function_args.get("filepath"),
                     )
-                elif function_name == "protein_mass":
+                elif function_name == "mass_calculator":
                     function_response = function_to_call(
-                        dna=function_args.get("dna")
+                        filepath=function_args.get("filepath"),
                     )
-                elif function_name == "open_reading_frames":
+                elif function_name == "restriction_sites":
                     function_response = function_to_call(
-                        dna=function_args.get("dna")
+                        filepath=function_args.get("filepath"),
                     )
-                elif function_name == "multiple_sequence_alignment":
+                elif function_name == "isoelectric_point":
                     function_response = function_to_call(
-                        dna=function_args.get("dna")
+                        filepath=function_args.get("filepath"),
+                    )
+                elif function_name == "render_protein_file":
+                    function_response = function_to_call(
+                        pdb_file_content=function_args.get("pdb_file_content"),
                     )
                 else:
-                    function_response = function_to_call(
-                        dna=function_args.get("dna"),
-                    )
-                    
+                    # Add handling for other functions if needed
+                    pass
 
             except json.JSONDecodeError:
                 function_response = "An error occurred while decoding the function arguments."
 
-        # Step 4: Extend the conversation with the function call and response
-        messages.append(response_message)  # Extend conversation with assistant's reply
+    # Step 4: Extend the conversation with the function call and response
+    # Extend the conversation with the assistant's reply
+    messages.append(response_message)
+    if function_response is not None:
         messages.append(
             {
                 "role": "function",
                 "name": function_name,
-                "content": function_response,
+                "content": str(function_response),
             }
-        )  # Extend conversation with function response
+        )  # Extend the conversation with the function response
 
-        # Step 5: Send the extended conversation to GPT for further interaction
-        second_response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0613",
-            messages=messages,
-        )
+    # Step 5: Send the extended conversation to GPT for further interaction
+    second_response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-0613",
+        messages=messages,
+    )
 
-        answer = second_response["choices"][0]["message"]["content"]
+    answer = second_response["choices"][0]["message"]["content"]
 
-        return answer
-
+    return answer

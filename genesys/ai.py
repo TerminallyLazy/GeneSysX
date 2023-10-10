@@ -192,7 +192,33 @@ functions = [
                 },
             },
             "required": ["filepath"]
-        }
+        },
+    },
+    {
+        "name": "construct_phylogenetic_tree",
+        "description": "Construct a phylogenetic tree using a FASTA file.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "open_reading_frames",
+        "description": "Find the open reading frames in a DNA sequence.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                },
+            },
+            "required": ["filepath"]
+        },
     }
 ]
 
@@ -242,7 +268,8 @@ def run_conversation(user_input, fasta_file):
             "restriction_sites": restriction_sites,
             "isoelectric_point": isoelectric_point,
             "render_protein_file": render_protein_file,
-            "multiple_sequence_alignment": multiple_sequence_alignment
+            "multiple_sequence_alignment": multiple_sequence_alignment,
+            "open_reading_frames":open_reading_frames,
         }
 
         function_name = response_message["function_call"]["name"]
@@ -251,7 +278,7 @@ def run_conversation(user_input, fasta_file):
         if function_to_call is not None:
             try:
                 function_args = json.loads(
-                    response_message["function_call"]["arguments"])
+                response_message["function_call"]["arguments"])
                 if function_name == "sequence_type":
                     function_response = function_to_call(
                         filepath=function_args.get("filepath"),
@@ -300,6 +327,11 @@ def run_conversation(user_input, fasta_file):
                     function_response = function_to_call(
                         filepath=function_args.get("filepath"),
                     )
+                elif function_name == "open_reading_frames":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
+                    )
+                    
                 else:
                     # Add handling for other functions if needed
                     pass

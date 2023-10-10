@@ -1,7 +1,6 @@
 import os
 import json
 import openai
-from .protein_render import *
 from .DNAToolKit import *
 from .env import load_dotenv
 
@@ -160,25 +159,6 @@ functions = [
             },
             "required": ["filepath"]
         },
-    },
-    {
-        "name": "render_protein_file",
-        "description": "Renders a 3D protein file.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "pdb_file_content": {
-                    "type": "string",
-                    "description": "The content of the PDB file to render in 3D."
-                },
-                "style": {
-                    "type": "string",
-                    "description": "The style to apply to the protein rendering (e.g., 'cartoon').",
-                    "default": "cartoon"
-                },
-            },
-            "required": ["pdb_file_content"]
-        }
     },
     {
         "name": "multiple_sequence_alignment",

@@ -12,5 +12,5 @@ TODO: point to the environment variable validation logic instead of enumerating 
 
 ```sh
 # ik it says run twice
-poetry run streamlit run genesys/interface.py
+poetry run streamlit run app.py
 ```

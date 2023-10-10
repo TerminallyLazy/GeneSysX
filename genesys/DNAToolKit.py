@@ -339,7 +339,7 @@ def multiple_sequence_alignment(filepath):
 
     aligned_seqs = MultipleSeqAlignment(alignment)
 
-    return str(aligned_seqs)
+    return aligned_seqs
 
 
 def construct_phylogenetic_tree(filepath):

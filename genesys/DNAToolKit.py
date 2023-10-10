@@ -247,6 +247,9 @@ def open_reading_frames(filepath):
             orf_seq = Seq(sequence)
             protein_seq = orf_seq.translate()
 
+            # Determine if it's a forward or reverse ORF
+            orf_type = "Forward" if sequence_number <= len(forward_orfs) else "Reverse"
+
             orfs_dict[sequence_number] = {
                 "Start position": start_position,
                 "Frame": frame,
@@ -254,6 +257,7 @@ def open_reading_frames(filepath):
                 "Length": length,
                 "Protein Sequence": str(protein_seq),
                 "Sequence ID": sequence_name,  # Include the sequence ID
+                "ORF Type": orf_type  # Add forward/reverse information
             }
 
         if sequence_name in orfs_results:

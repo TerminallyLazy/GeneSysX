@@ -209,7 +209,7 @@ functions = [
     },
     {
         "name": "open_reading_frames",
-        "description": "Find the open reading frames in a DNA sequence.",
+        "description": "Finds the forward and reverse open reading frames in a DNA sequence.",
         "parameters": {
             "type": "object",
             "properties": {

@@ -179,6 +179,20 @@ functions = [
             },
             "required": ["pdb_file_content"]
         }
+    },
+    {
+        "name": "multiple_sequence_alignment",
+        "description": "Perform multiple sequence alignment using a FASTA file.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                    "description": "Path to the FASTA file."
+                },
+            },
+            "required": ["filepath"]
+        }
     }
 ]
 
@@ -228,6 +242,7 @@ def run_conversation(user_input, fasta_file):
             "restriction_sites": restriction_sites,
             "isoelectric_point": isoelectric_point,
             "render_protein_file": render_protein_file,
+            "multiple_sequence_alignment": multiple_sequence_alignment
         }
 
         function_name = response_message["function_call"]["name"]
@@ -280,6 +295,10 @@ def run_conversation(user_input, fasta_file):
                 elif function_name == "render_protein_file":
                     function_response = function_to_call(
                         pdb_file_content=function_args.get("pdb_file_content"),
+                    )
+                elif function_name == "multiple_sequence_alignment":
+                    function_response = function_to_call(
+                        filepath=function_args.get("filepath"),
                     )
                 else:
                     # Add handling for other functions if needed

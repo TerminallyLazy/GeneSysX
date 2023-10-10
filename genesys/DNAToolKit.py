@@ -201,9 +201,68 @@ def mass_calculator(filepath):
 
 # TO DO : revist this function
 
-
 def open_reading_frames(filepath):
-    pass
+    """
+    Find and translate all open reading frames (ORFs) in a DNA sequence.
+
+    Parameters:
+    - filepath: Path to the FASTA file containing the DNA sequence.
+
+    Returns:
+    - A dictionary where keys are sequence IDs and values are dictionaries with ORF information.
+    """
+    
+    orfs_results = {}  # Dictionary to store results for multiple sequences
+    for record in SeqIO.parse(filepath, "fasta"):
+        sequence = record.seq
+        sequence_name = record.id
+
+        def find_orfs(sequence):
+            orfs = []
+            for i in range(len(sequence) - 2):
+                if sequence[i:i+3] == 'ATG':
+                    orf = 'ATG'
+                    x = 3
+                    while i+x < len(sequence) and sequence[i+x:i+3+x] not in ['TAG', 'TAA', 'TGA']:
+                        orf += sequence[i+x:i+3+x]
+                        x += 3
+                    if len(orf) > 90:
+                        orfs.append((i, orf, len(orf)))
+            return orfs
+
+        forward_orfs = find_orfs(sequence)
+        reverse_sequence = sequence.reverse_complement()
+        reverse_orfs = find_orfs(reverse_sequence)
+
+        all_orfs = forward_orfs + [(len(sequence) - info[0] - info[2], info[1], info[2]) for info in reverse_orfs]
+
+        orfs_dict = {}
+        for idx, orf_info in enumerate(all_orfs, start=1):
+            sequence_number = idx
+            start_position = orf_info[0]
+            frame = ((start_position % 3) + 1) if sequence_number <= len(forward_orfs) else ((len(sequence) - start_position - orf_info[2]) % 3) + 1
+            sequence = orf_info[1]
+            length = orf_info[2]
+
+            orf_seq = Seq(sequence)
+            protein_seq = orf_seq.translate()
+
+            orfs_dict[sequence_number] = {
+                "Start position": start_position,
+                "Frame": frame,
+                "Sequence": sequence,
+                "Length": length,
+                "Protein Sequence": str(protein_seq),
+                "Sequence ID": sequence_name,  # Include the sequence ID
+            }
+
+        if sequence_name in orfs_results:
+            orfs_results[sequence_name].update(orfs_dict)
+        else:
+            orfs_results[sequence_name] = orfs_dict
+
+    return orfs_results
+
 
 
 def find_recognition_sites(dna_sequence, enzyme_name):

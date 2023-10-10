@@ -1,7 +1,7 @@
 import os
 import json
 import openai
-from .DNAToolKit import *
+from . import DNAToolKit as toolkit
 from .env import load_dotenv
 
 load_dotenv()
@@ -236,85 +236,13 @@ def run_conversation(user_input, fasta_file):
     # Step 2: Check if GPT wants to call a function
     if response_message.get("function_call"):
         # Step 3: Call the function based on the model's response
-        available_functions = {
-            "sequence_type": sequence_type,
-            "count_occurences": count_occurences,
-            "transcription": transcription,
-            "complementary": complementary,
-            "reverseComplementary": reverseComplementary,
-            "gc_content": gc_content,
-            "translation": translation,
-            "mass_calculator": mass_calculator,
-            "restriction_sites": restriction_sites,
-            "isoelectric_point": isoelectric_point,
-            "render_protein_file": render_protein_file,
-            "multiple_sequence_alignment": multiple_sequence_alignment,
-            "open_reading_frames":open_reading_frames,
-        }
-
         function_name = response_message["function_call"]["name"]
-        function_to_call = available_functions.get(function_name)
 
-        if function_to_call is not None:
+        if function_name is not None:
             try:
-                function_args = json.loads(
-                response_message["function_call"]["arguments"])
-                if function_name == "sequence_type":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "count_occurences":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "transcription":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "complementary":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "reverseComplementary":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "gc_content":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "translation":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "mass_calculator":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "restriction_sites":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "isoelectric_point":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "render_protein_file":
-                    function_response = function_to_call(
-                        pdb_file_content=function_args.get("pdb_file_content"),
-                    )
-                elif function_name == "multiple_sequence_alignment":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                elif function_name == "open_reading_frames":
-                    function_response = function_to_call(
-                        filepath=function_args.get("filepath"),
-                    )
-                    
-                else:
-                    # Add handling for other functions if needed
-                    pass
+                function_to_call = getattr(toolkit, function_name)
+                function_args = json.loads(response_message["function_call"]["arguments"])
+                function_response = function_to_call(filepath=function_args.get("filepath"))
 
             except json.JSONDecodeError:
                 function_response = "An error occurred while decoding the function arguments."

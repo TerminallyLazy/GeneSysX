@@ -11,6 +11,7 @@ from Bio import AlignIO
 import matplotlib.pyplot as plt
 import streamlit as st
 from Bio.SeqRecord import SeqRecord
+import io
 
 
 def sequence_type(filepath):
@@ -349,33 +350,6 @@ def multiple_sequence_alignment(filepath):
             
 
     return MultipleSeqAlignment(aligned_seqs)
-
-def construct_phylogenetic_tree(filepath):
-    """
-    Construct a phylogenetic tree from a FASTA file and display it in Streamlit.
-
-    Parameters:
-    - filepath: Path to the FASTA file containing the sequences to align.
-    """
-    import io
-    # Check if a file is uploaded
-    if filepath is not None:
-        aligned_seqs = multiple_sequence_alignment(filepath)
-        calculator = DistanceCalculator("identity")
-        constructor = DistanceTreeConstructor(calculator)
-        tree = constructor.build_tree(aligned_seqs)
-        
-        # Save the tree plot to a BytesIO object
-        img_buffer = io.BytesIO()
-        Phylo.draw(tree, do_show=False)
-        plt.savefig(img_buffer, format='png')
-        img_buffer.seek(0)
-        
-        # Display the tree plot in Streamlit
-        st.image(img_buffer, caption="Phylogenetic Tree")
-    else:
-        st.warning("Upload a FASTA file to generate the phylogenetic tree.")
-
 
 # REVISIT THIS FUNCTION WITH CHARLIE
 

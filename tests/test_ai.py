@@ -7,6 +7,7 @@ import os
 import pytest
 import openai
 from genesys import ai
+from genesys import visuals
 
 TEST_DATA_DIR = "tests/fixtures"
 
@@ -121,6 +122,15 @@ def test_ask_orf():
     response_message = response["choices"][0]["message"]
     assert response_message.get("function_call")
     assert response_message["function_call"]["name"] == "open_reading_frames"
+
+def test_ask_phylo():
+    response = question_about_file(
+        "What is the phylogenetic tree of the given sequences?",
+        os.path.join(TEST_DATA_DIR, "msa.fasta")
+    )
+    response_message = response["choices"][0]["message"]
+    assert response_message.get("function_call")
+    assert response_message["function_call"]["name"] == "construct_phylogenetic_tree"
 
 @pytest.mark.skip(reason="used for manual testing")
 def test_run_conversation():

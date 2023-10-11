@@ -66,8 +66,8 @@ BLAST searches: Implements various BLAST algorithms for sequence similarity sear
     - [x] Compute the Hamming distance between two DNA sequences of the same length
     - [x] Identifiy open reading frames (ORFs) in a DNA sequence and translate them into protein sequences 
     - [x] Implement restriction site detection
-        - [ ] Further it by suggesting respective restriction enzymes
-    - [ ] Implement Multiple Sequence Alignment
+        - [x] Further it by suggesting respective restriction enzymes
+    - [x] Implement Multiple Sequence Alignment
     - [ ] Generate phylogenetic trees from MSA
     - [x] 3D Protein Structure Visualization
     - [x] SNP (Single Nucleotide Polymorphism) detection 

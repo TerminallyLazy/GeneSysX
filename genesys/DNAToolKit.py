@@ -9,6 +9,8 @@ from Bio import Restriction
 from Bio.Align import MultipleSeqAlignment
 from Bio import AlignIO
 import matplotlib.pyplot as plt
+import streamlit as st
+from Bio.SeqRecord import SeqRecord
 
 
 def sequence_type(filepath):
@@ -337,33 +339,43 @@ def multiple_sequence_alignment(filepath):
     with open(filepath, "r") as text_file:
         alignment = AlignIO.read(text_file, "fasta")
 
-    aligned_seqs = MultipleSeqAlignment(alignment)
+    aligned_seqs = []
 
-    return aligned_seqs
+    for record in alignment:
+        if sequence_type(filepath) == "Protein":
+            aligned_seqs.append(record)
+        elif sequence_type(filepath) == "DNA":
+            aligned_seqs.append(SeqRecord(record.seq.translate(), id=record.id))
+            
 
+    return MultipleSeqAlignment(aligned_seqs)
 
 def construct_phylogenetic_tree(filepath):
     """
-    Construct a phylogenetic tree from a FASTA file.
+    Construct a phylogenetic tree from a FASTA file and display it in Streamlit.
 
     Parameters:
     - filepath: Path to the FASTA file containing the sequences to align.
-
-    Returns:
-    - A Phylo.Tree object representing the phylogenetic tree.
     """
+    import io
+    # Check if a file is uploaded
+    if filepath is not None:
+        aligned_seqs = multiple_sequence_alignment(filepath)
+        calculator = DistanceCalculator("identity")
+        constructor = DistanceTreeConstructor(calculator)
+        tree = constructor.build_tree(aligned_seqs)
+        
+        # Save the tree plot to a BytesIO object
+        img_buffer = io.BytesIO()
+        Phylo.draw(tree, do_show=False)
+        plt.savefig(img_buffer, format='png')
+        img_buffer.seek(0)
+        
+        # Display the tree plot in Streamlit
+        st.image(img_buffer, caption="Phylogenetic Tree")
+    else:
+        st.warning("Upload a FASTA file to generate the phylogenetic tree.")
 
-    aligned_seqs = multiple_sequence_alignment(filepath)
-    calculator = DistanceCalculator("identity")
-    constructor = DistanceTreeConstructor(calculator)
-    tree = constructor.build_tree(aligned_seqs)
-
-    fig, ax = plt.subplots(figsize=(10, 20))
-    Phylo.draw(tree, axes=ax)
-
-    fig.savefig("phylogenetic_tree.png")
-
-    return tree
 
 # REVISIT THIS FUNCTION WITH CHARLIE
 

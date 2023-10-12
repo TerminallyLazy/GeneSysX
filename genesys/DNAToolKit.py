@@ -11,7 +11,7 @@ from Bio import AlignIO
 import matplotlib.pyplot as plt
 import streamlit as st
 from Bio.SeqRecord import SeqRecord
-import io
+import re
 from collections import defaultdict
 
 
@@ -360,7 +360,7 @@ def detect_snps(filepath):
     Detect singular nucleotide polymorphisms (SNPs) between multiple DNA sequences in a FASTA file.
 
     Parameters:
-    - fasta_file: Path to the FASTA file containing DNA sequences to compare.
+    - filepath: Path to the FASTA file containing DNA sequences to compare.
 
     Returns:
     - Dictionary where the keys are sequence IDs and values are dictionaries of SNP positions and nucleotides.
@@ -386,3 +386,15 @@ def detect_snps(filepath):
                 snps[seq_id][f"position {i}"] = nucleotides[j]
 
     return snps
+
+def find_motifs(filepath, motif):
+    motif_positions = {}
+
+    for record in SeqIO.parse(filepath, "fasta"):
+        sequence_str = str(record.seq)
+        matches = [match.start() for match in re.finditer(motif, sequence_str)]
+        motif_positions[record.id] = matches
+
+    return motif_positions
+
+print(find_motifs("tests/fixtures/random_dna.fasta", "ATG")) 

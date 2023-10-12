@@ -396,5 +396,3 @@ def find_motifs(filepath, motif):
         motif_positions[record.id] = matches
 
     return motif_positions
-
-print(find_motifs("tests/fixtures/random_dna.fasta", "ATG")) 

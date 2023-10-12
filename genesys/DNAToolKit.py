@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 from Bio.SeqRecord import SeqRecord
 import io
+from collections import defaultdict
 
 
 def sequence_type(filepath):
@@ -354,23 +355,39 @@ def multiple_sequence_alignment(filepath):
 # REVISIT THIS FUNCTION WITH CHARLIE
 
 
-def detect_snps(seq1, seq2):
+def detect_snps(filepath):
     """
-    Detect singular nucleotide polymorphisms (SNPs) between two DNA sequences.
+    Detect singular nucleotide polymorphisms (SNPs) between multiple DNA sequences in a FASTA file.
 
     Parameters:
-    - seq1, seq2: strings representing the DNA sequences to compare. They should be of the same length.
+    - fasta_file: Path to the FASTA file containing DNA sequences to compare.
 
     Returns:
-    - List of tuples (position, nucleotide_from_seq1, nucleotide_from_seq2) representing the SNPs.
+    - Dictionary where the keys are sequence IDs and values are dictionaries of SNP positions and nucleotides.
     """
 
-    # Ensure both sequences are of the same length
-    if len(seq1) != len(seq2):
-        raise ValueError("The sequences should be of the same length.")
+    # Parse sequences from the FASTA file
+    records = list(SeqIO.parse(filepath, "fasta"))
+    sequences = [str(record.seq) for record in records]
+    sequence_ids = [record.id for record in records]
 
-    # Detect SNPs
-    snps = [(i, seq1[i], seq2[i])
-            for i in range(len(seq1)) if seq1[i] != seq2[i]]
+    # Ensure all sequences are of the same length
+    seq_length = len(sequences[0])
+    if not all(len(seq) == seq_length for seq in sequences):
+        raise ValueError("All sequences should be of the same length.")
+
+    # Detect SNPs for each sequence
+    snps = defaultdict(dict)
+
+    for i in range(seq_length):
+        nucleotides = [seq[i] for seq in sequences]
+        if len(set(nucleotides)) > 1:
+            for j, seq_id in enumerate(sequence_ids):
+                snps[seq_id][f"position {i}"] = nucleotides[j]
 
     return snps
+
+
+
+
+print(detect_snps('tests/fixtures/msa.fasta'))

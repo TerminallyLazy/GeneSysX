@@ -68,9 +68,10 @@ BLAST searches: Implements various BLAST algorithms for sequence similarity sear
     - [x] Implement restriction site detection
         - [x] Further it by suggesting respective restriction enzymes
     - [x] Implement Multiple Sequence Alignment
-    - [ ] Generate phylogenetic trees from MSA
+    - [x] Generate phylogenetic trees from MSA
     - [x] 3D Protein Structure Visualization
-    - [x] SNP (Single Nucleotide Polymorphism) detection 
+    - [x] SNP (Single Nucleotide Polymorphism) detection
+    - [x] Motif Finder 
     - [ ] Primer Design Automation
     - [ ] BLAST implementation
         - [ ] BLASTn

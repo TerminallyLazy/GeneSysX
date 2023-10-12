@@ -132,6 +132,24 @@ def test_ask_phylo():
     assert response_message.get("function_call")
     assert response_message["function_call"]["name"] == "construct_phylogenetic_tree"
 
+def test_ask_snps():
+    response = question_about_file(
+        "What are the SNPs in the given sequences?",
+        os.path.join(TEST_DATA_DIR, "msa.fasta")
+    )
+    response_message = response["choices"][0]["message"]
+    assert response_message.get("function_call")
+    assert response_message["function_call"]["name"] == "detect_snps"
+
+def test_find_motifs():
+    response = question_about_file(
+        "What are the ATG motifs in the given sequences?",
+        os.path.join(TEST_DATA_DIR, "random_dna.fasta")
+    )
+    response_message = response["choices"][0]["message"]
+    assert response_message.get("function_call")
+    assert response_message["function_call"]["name"] == "find_motifs"
+
 @pytest.mark.skip(reason="used for manual testing")
 def test_run_conversation():
     filepath = os.path.join(TEST_DATA_DIR, "sequence.fasta")

@@ -1,6 +1,7 @@
 import pytest
 import os
 from genesys.DNAToolKit import *
+from genesys.visuals import *
 
 TEST_DATA_DIR = "tests/fixtures"
 

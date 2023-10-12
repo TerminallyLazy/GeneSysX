@@ -272,9 +272,12 @@ def run_conversation(user_input, fasta_file):
                 function_to_call = getattr(toolkit, function_name)
                 function_args = json.loads(response_message["function_call"]["arguments"])
                 filepath = function_args.get("filepath")
-                motif = function_args.get("motif") 
+                motif = function_args.get("motif", None)
 
-                function_response = function_to_call(filepath=filepath, motif=motif)  # Pass the motif argument
+                if function_name == "find_motifs":
+                    function_response = function_to_call(filepath=filepath, motif=motif)
+                else:
+                    function_response = function_to_call(filepath=filepath) 
 
             except json.JSONDecodeError:
                 function_response = "An error occurred while decoding the function arguments."

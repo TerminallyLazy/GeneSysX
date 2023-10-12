@@ -189,7 +189,20 @@ functions = [
     },
     {
         "name": "open_reading_frames",
-        "description": "Finds the forward and reverse open reading frames in a DNA sequence.",
+        "description": "Finds the forward and reverse open reading frames",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                },
+            },
+            "required": ["filepath"]
+        },
+    },
+    {
+        "name": "detect_snps",
+        "description": "Detect single nucleotide polymorphisms (SNPs)",
         "parameters": {
             "type": "object",
             "properties": {

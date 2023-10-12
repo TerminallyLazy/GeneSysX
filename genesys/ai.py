@@ -212,6 +212,22 @@ functions = [
             },
             "required": ["filepath"]
         },
+    },
+    {
+        "name": "find_motifs",
+        "description": "Find motifs in a DNA sequence",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filepath": {
+                    "type": "string",
+                },
+                "motif": {
+                    "type": "string",
+                }
+            },
+            "required": ["filepath", "motif"]
+        }
     }
 ]
 
@@ -255,7 +271,10 @@ def run_conversation(user_input, fasta_file):
             try:
                 function_to_call = getattr(toolkit, function_name)
                 function_args = json.loads(response_message["function_call"]["arguments"])
-                function_response = function_to_call(filepath=function_args.get("filepath"))
+                filepath = function_args.get("filepath")
+                motif = function_args.get("motif") 
+
+                function_response = function_to_call(filepath=filepath, motif=motif)  # Pass the motif argument
 
             except json.JSONDecodeError:
                 function_response = "An error occurred while decoding the function arguments."

@@ -386,8 +386,3 @@ def detect_snps(filepath):
                 snps[seq_id][f"position {i}"] = nucleotides[j]
 
     return snps
-
-
-
-
-print(detect_snps('tests/fixtures/msa.fasta'))

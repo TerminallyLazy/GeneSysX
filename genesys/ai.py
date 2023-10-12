@@ -78,7 +78,7 @@ functions = [
     },
     {
         "name": "reverseComplementary",
-        "description": "Find the reverse complementary DNA sequence to a given DNA sequence.",
+        "description": "Find the reverse complementary of a sequence.",
         "parameters": {
             "type": "object",
             "properties": {

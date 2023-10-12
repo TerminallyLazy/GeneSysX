@@ -98,10 +98,12 @@ def complementary(filepath):
 
     for seq_id, seq_record in sequences.items():
 
-        if sequence_type(filepath) != "DNA":
-            raise ValueError("Unable to perform operation: Not a DNA sequence")
-
-        sequence = seq_record.seq
+        if sequence_type(filepath) == "DNA":
+            sequence = seq_record.seq
+        elif sequence_type(filepath) == "RNA":
+            sequence = seq_record.seq.back_transcribe()
+        else:
+            raise ValueError("Unable to perform operation: Uncompatible sequence type")
         complementary_sequence = str(sequence.complement())
         complementary_sequences[seq_id] = complementary_sequence
 
@@ -110,10 +112,17 @@ def complementary(filepath):
 
 # Gives the reverse complementary DNA sequence to a given DNA seq
 
-def reverseComplementary(dna):
-    reverseSeq = complementary(dna)
+def reverseComplementary(filepath):
 
-    return reverseSeq[::-1]
+    if sequence_type == "DNA" or "RNA":
+        reverseSeq = complementary(filepath)
+    else:
+        raise ValueError("Unable to perform operation: Uncompatible sequence type")
+
+    # Convert dictionary to list of tuples, reverse the list, and convert back to dictionary
+    reverseSeq = dict(reversed(list(reverseSeq.items())))
+
+    return reverseSeq
 
 # The combined above two functions into one GC content calculator
 
@@ -149,10 +158,13 @@ def translation(filepath):
     translated_sequences = {}
 
     for seq_id, seq_record in sequences.items():
-        if sequence_type(filepath) != "DNA":
+        if sequence_type(filepath) == "Protein":
             raise ValueError("Unable to perform operation: Not a DNA sequence")
+        elif sequence_type(filepath) == "RNA":
+            sequence = seq_record.seq
+        elif sequence_type(filepath) == "DNA":
+            sequence = seq_record.seq.transcribe()
 
-        sequence = seq_record.seq
         num_n_to_add = 3 - (len(sequence) % 3)
         sequence = sequence + Seq("N" * num_n_to_add)
 

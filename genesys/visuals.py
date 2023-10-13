@@ -71,6 +71,3 @@ def render_mol(xyz):
     xyzview.setBackgroundColor('white')#('0xeeeeee')
     xyzview.zoomTo()
     showmol(xyzview, height = 500,width=800)
-
-
-construct_phylogenetic_tree("tests/fixtures/msa.fasta")

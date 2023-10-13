@@ -1,3 +1,5 @@
+import os
+import streamlit as st
 from dotenv import load_dotenv as _load_dotenv
 
 def load_dotenv():
@@ -14,6 +16,8 @@ def load_dotenv():
     """
     try:
         _load_dotenv()
+        if os.getenv("OPENAI_API_KEY") is None:
+            os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
     except ValueError:
         pass
 

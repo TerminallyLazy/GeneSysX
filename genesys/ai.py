@@ -1,6 +1,7 @@
 import os
 import json
 import openai
+from . import eventcreator as ec
 from . import DNAToolKit as toolkit
 from .env import load_dotenv
 
@@ -231,7 +232,7 @@ functions = [
     }
 ]
 
-def run_conversation(user_input, fasta_file):
+def run_conversation(user_input, fasta_file, username, current_session):
     # Step 1: Send the user query and available functions to GPT-3.5 Turbo
     messages = [
         {
@@ -243,9 +244,10 @@ def run_conversation(user_input, fasta_file):
             "content": f"""
                 {user_input}
 
-                '{fasta_file}'
+                '{fasta_file}' 
             """
-        }
+        } # TODO: Are we giving chat gpt the entire fasta content? We should review and rethink this strategy. We are going to get a ton of out of token errors. 
+        # TODO: If we are married to this we atleast need to incorporate a token estimator to catch this error before it happens and figure out a chunking strategy.
     ]
 
     # TODO: extract chat completion options
@@ -254,10 +256,11 @@ def run_conversation(user_input, fasta_file):
         messages=messages,
         functions=functions,
         function_call="auto",  # The model decides whether to call a function,
-        temperature=0.3,
+        temperature=0.3, # Note: Good temperature choice.
     )
 
     response_message = response["choices"][0]["message"]
+    ec.create_response_event(username, current_session, response_message)
 
     # Initialize function_response with a default value
     function_response = None
@@ -281,7 +284,8 @@ def run_conversation(user_input, fasta_file):
 
             except json.JSONDecodeError:
                 function_response = "An error occurred while decoding the function arguments."
-
+    
+    ec.create_response_event(username, current_session, function_response)
     # Step 4: Extend the conversation with the function call and response
     # Extend the conversation with the assistant's reply
     messages.append(response_message)
@@ -301,5 +305,6 @@ def run_conversation(user_input, fasta_file):
     )
 
     answer = second_response["choices"][0]["message"]["content"]
+    ec.create_response_event(username, current_session, answer)
 
     return answer

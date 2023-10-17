@@ -255,7 +255,7 @@ def update_session(user_id:str, updated_session:dict):
     json_data = json.dumps(json_list)
     client.upload_s3(content=json_data, user_id=user_id, data_file=session_group)
 
-def get_session_dict(user_id:str, session_id:str, json_list:list):
+def get_session_dict(user_id:str, session_id:str, json_list:list) -> dict:
     for sesh in json_list:
         if sesh['sessionId'] == session_id:
             return sesh

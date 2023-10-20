@@ -36,13 +36,16 @@ def create_session(session_id: str, user_id) -> dict:
         json_list.append(new_session)
         json_data = json.dumps(json_list)
     else:
+        logging.info("Session Group Exists")
+        logging.info("Downloading Old Session Group")
         content = str(client.download_s3(user_id, data_file=session_group))
         content = content[2:][:-1]
-        print(content)
+        logging.info("Loading old session group as json")
         json_data = json.loads(content)
-        print(type(json_data))
+        logging.info('Creating Session Data')
         json_data.append(new_session)
         json_data = json.dumps(json_data)
+    logging.info("Uploading Session Data to S3")
     client.upload_s3(content=json_data, user_id=user_id, data_file=session_group)
     
     return new_session

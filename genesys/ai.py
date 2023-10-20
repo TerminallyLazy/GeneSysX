@@ -260,7 +260,7 @@ def run_conversation(user_input, fasta_file, username, current_session):
     )
 
     response_message = response["choices"][0]["message"]
-    ec.create_response_event(username, current_session, response_message)
+    # ec.create_response_event(username, current_session, response_message)
 
     # Initialize function_response with a default value
     function_response = None
@@ -285,7 +285,7 @@ def run_conversation(user_input, fasta_file, username, current_session):
             except json.JSONDecodeError:
                 function_response = "An error occurred while decoding the function arguments."
     
-    ec.create_response_event(username, current_session, function_response)
+    # ec.create_response_event(username, current_session, function_response)
     # Step 4: Extend the conversation with the function call and response
     # Extend the conversation with the assistant's reply
     messages.append(response_message)
@@ -305,6 +305,6 @@ def run_conversation(user_input, fasta_file, username, current_session):
     )
 
     answer = second_response["choices"][0]["message"]["content"]
-    ec.create_response_event(username, current_session, answer)
+    # ec.create_response_event(username, current_session, answer)
 
     return answer

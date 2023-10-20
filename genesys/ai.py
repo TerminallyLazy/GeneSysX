@@ -232,7 +232,7 @@ functions = [
     }
 ]
 
-def run_conversation(user_input, fasta_file, username, current_session):
+def run_conversation(user_input, fasta_file):
     # Step 1: Send the user query and available functions to GPT-3.5 Turbo
     messages = [
         {

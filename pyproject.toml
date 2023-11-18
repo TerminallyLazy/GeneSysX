@@ -20,6 +20,7 @@ ipython-genutils = "^0.2.0"
 httpx = "^0.25.0"
 streamlit-authenticator = "0.1.5"
 primer3-py = "^2.0.1"
+typing-extensions = "^4.8.0"
 
 
 [tool.poetry.group.dev.dependencies]

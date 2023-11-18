@@ -1,18 +1,16 @@
 import collections
-from Bio import Phylo, SeqIO
-from Bio.SeqUtils.ProtParam import molecular_weight
+import re
+
+from typing import Annotated
+from typing_extensions import Doc
+
+from Bio import AlignIO, Restriction, SeqIO
+from Bio.Align import MultipleSeqAlignment
 from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
 from Bio.SeqUtils import gc_fraction
 from Bio.SeqUtils.IsoelectricPoint import IsoelectricPoint as IP
-from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
-from Bio import Restriction
-from Bio.Align import MultipleSeqAlignment
-from Bio import AlignIO
-import matplotlib.pyplot as plt
-import streamlit as st
-from Bio.SeqRecord import SeqRecord
-import re
-from collections import defaultdict
+from Bio.SeqUtils.ProtParam import molecular_weight
 
 
 def sequence_type(filepath):
@@ -389,7 +387,7 @@ def detect_snps(filepath):
         raise ValueError("All sequences should be of the same length.")
 
     # Detect SNPs for each sequence
-    snps = defaultdict(dict)
+    snps = collections.defaultdict(dict)
 
     for i in range(seq_length):
         nucleotides = [seq[i] for seq in sequences]

@@ -1,5 +1,9 @@
 # Developing
 
+## [Google Python style guide](https://google.github.io/styleguide/pyguide.html)
+
+A list of "dos and don'ts" for Python programs with explanations. Pretty solid advice imo.
+
 ## Package manager
 
 To run this project, you need to use the [Poetry package manager](https://python-poetry.org/docs/).

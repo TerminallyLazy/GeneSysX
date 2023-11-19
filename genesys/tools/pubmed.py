@@ -26,5 +26,3 @@ def fetch_papers(query: str , max_results=10) -> list:
         papers.append((pmid, title))
     
     return papers
-
-print(fetch_papers("genomics, cancer, crispr"))

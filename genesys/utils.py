@@ -1,6 +1,6 @@
 import inspect
-import types
 import typing
+from types import GenericAlias, ModuleType, UnionType
 from typing import Annotated, Any, Callable
 
 from typing_extensions import Doc
@@ -13,7 +13,7 @@ def _lenient_issubclass(cls: Any, class_or_tuple: Any) -> bool:
     try:
         return isinstance(cls, type) and issubclass(cls, class_or_tuple)
     except TypeError:
-        if isinstance(cls, (typing._GenericAlias, types.GenericAlias, types.UnionType)):
+        if isinstance(cls, (typing._GenericAlias, GenericAlias, UnionType)):
             return False
         else:
             raise
@@ -44,9 +44,8 @@ def gen_function_schema(func: Callable[..., Any]) -> dict[str, Any]:
 
     for name, param in inspect.signature(func).parameters.items():
         type_hint = param.annotation
-        props[name] = {}
+        props[name] = { "type": to_json_type(typing._strip_annotations(type_hint)) }
         if is_annotated(type_hint):
-            props[name]["type"] = to_json_type(typing._strip_annotations(type_hint))
             for metadata in type_hint.__metadata__:
                 if isinstance(metadata, Doc):
                     props[name]["description"] = metadata.documentation

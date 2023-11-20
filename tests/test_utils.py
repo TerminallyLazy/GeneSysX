@@ -27,6 +27,7 @@ def test_annotated_param():
 
 def test_get_function_params():
     schema = utils.gen_function_schema(pythagoras)
-    assert isinstance(schema.get("parameters"), dict)
     assert schema["parameters"]["properties"]["a"]["type"] == "number"
+    assert schema["parameters"]["properties"]["a"]["description"] == "The length of side A"
     assert schema["parameters"]["properties"]["b"]["type"] == "number"
+    assert schema["parameters"]["properties"]["b"]["description"] == "The length of side B"

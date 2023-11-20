@@ -30,7 +30,7 @@ def to_json_type(tp: type) -> str:
         return 'boolean'
     elif tp == float or tp == int:
         return 'number'
-    elif tp == type:
+    elif tp == str:
         return 'string'
     elif tp == list:
         return 'array'

@@ -10,6 +10,10 @@ def f(x: float, y: float) -> float:
     """A simple function without documentation in annotated metadata."""
     return x + y
 
+def greet(name: str = "friend") -> str:
+    """Returns a friendly greeting."""
+    return f"Hello there {name}!"
+
 def pythagoras(
     a: Annotated[float, Doc("The length of side A.")],
     b: Annotated[float, Doc("The length of side B.")],
@@ -61,4 +65,9 @@ def test_get_simple_param_annotations():
     assert schema["parameters"]["properties"]["y"]["type"] == "number"
     assert schema["parameters"]["properties"]["x"].get("description") is None
     assert schema["parameters"]["properties"]["y"].get("description") is None
+
+def test_get_default_param_value():
+    schema = utils.gen_function_schema(greet)
+    assert schema["parameters"]["properties"]["name"]["type"] == "string"
+    assert schema["parameters"]["properties"]["name"]["default"] == "friend"
 

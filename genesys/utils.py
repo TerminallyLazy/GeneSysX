@@ -43,8 +43,14 @@ def gen_function_schema(func: Callable[..., Any]) -> dict[str, Any]:
     props = {}
 
     for name, param in inspect.signature(func).parameters.items():
+        props[name] = {}
+
+        if param.default is not param.empty:
+            props[name]["default"] = param.default
+
         type_hint = param.annotation
-        props[name] = { "type": to_json_type(typing._strip_annotations(type_hint)) }
+        props[name]["type"] = to_json_type(typing._strip_annotations(type_hint))
+
         if is_annotated(type_hint):
             for metadata in type_hint.__metadata__:
                 if isinstance(metadata, Doc):

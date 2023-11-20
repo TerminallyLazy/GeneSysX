@@ -3,16 +3,22 @@ from typing_extensions import Doc
 from genesys import utils
 
 def pythagoras(
-    a: Annotated[float, "The length of one of the two sides of the triangle"],
-    b: Annotated[float, "THe length of the other one of the two sides of the triangle"],
-) -> Annotated[float, "The length of the hypotenuse of the triangle"]:
-    """Calculate the length of the hypotenuse of a triangle."""
+    a: Annotated[float, Doc("The length of side A.")],
+    b: Annotated[float, Doc("The length of side B.")],
+) -> Annotated[float, Doc("The length of side C.")]:
+    """Calculate the length of the hypotenuse of a right triangle."""
     pass
 
 def test_get_function_description():
     schema = utils.gen_function_schema(pythagoras)
-    assert schema.get("description") == "Calculate the length of the hypotenuse of a triangle."
+    assert schema.get("description") == "Calculate the length of the hypotenuse of a right triangle."
 
 def test_get_function_name():
     schema = utils.gen_function_schema(pythagoras)
     assert schema.get("name") == "pythagoras"
+
+def test_get_function_params():
+    schema = utils.gen_function_schema(pythagoras)
+    assert isinstance(schema.get("parameters"), dict)
+    assert schema["parameters"]["properties"]["a"]["type"] == "number"
+    assert schema["parameters"]["properties"]["b"]["type"] == "number"

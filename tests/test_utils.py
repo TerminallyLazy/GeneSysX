@@ -71,3 +71,11 @@ def test_get_default_param_value():
     assert schema["parameters"]["properties"]["name"]["type"] == "string"
     assert schema["parameters"]["properties"]["name"]["default"] == "friend"
 
+def test_gen_tools_schema():
+    from genesys.tools import pubmed
+
+    schema = utils.gen_tools_schema(pubmed)
+    assert type(schema) == list
+    
+    for tool in schema:
+        assert tool["type"] == "function"

@@ -66,3 +66,15 @@ def gen_function_schema(func: Callable[..., Any]) -> dict[str, Any]:
     }
 
     return schema
+
+def gen_tools_schema(mod: ModuleType) -> list[dict]:
+    tools = []
+
+    for name, fn in inspect.getmembers(mod):
+        if inspect.isfunction(fn) and not name.startswith("_"):
+            tools.append({
+                "type": "function",
+                "function": gen_function_schema(fn)
+            })
+
+    return tools

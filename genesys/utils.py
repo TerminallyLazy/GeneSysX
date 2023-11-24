@@ -41,12 +41,15 @@ def to_json_type(tp: type) -> str:
 
 def gen_function_schema(func: Callable[..., Any]) -> dict[str, Any]:
     props = {}
+    required = []
 
     for name, param in inspect.signature(func).parameters.items():
         props[name] = {}
 
         if param.default is not param.empty:
             props[name]["default"] = param.default
+        else:
+            required.append(name)
 
         type_hint = param.annotation
         props[name]["type"] = to_json_type(typing._strip_annotations(type_hint))
@@ -65,13 +68,20 @@ def gen_function_schema(func: Callable[..., Any]) -> dict[str, Any]:
         }
     }
 
+    if len(required) > 0:
+        schema["parameters"]["required"] = required
+
     return schema
 
 def gen_tools_schema(mod: ModuleType) -> list[dict]:
     tools = []
 
     for name, fn in inspect.getmembers(mod):
-        if inspect.isfunction(fn) and not name.startswith("_"):
+        if (
+            not name.startswith("_")
+            and inspect.isfunction(fn)
+            and fn.__module__ == mod.__name__
+        ):
             tools.append({
                 "type": "function",
                 "function": gen_function_schema(fn)

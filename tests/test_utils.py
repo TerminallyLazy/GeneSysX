@@ -57,6 +57,10 @@ def test_get_simple_function_schema():
         schema["description"]
         == "A simple function without documentation in annotated metadata."
     )
+    required_params: list = schema["parameters"]["required"]
+    assert len(required_params) == 2
+    assert "x" in required_params
+    assert "y" in required_params
 
 
 def test_get_simple_param_annotations():
@@ -75,7 +79,7 @@ def test_gen_tools_schema():
     from genesys.tools import pubmed
 
     schema = utils.gen_tools_schema(pubmed)
-    assert type(schema) == list
+    assert isinstance(schema, list)
     
     for tool in schema:
         assert tool["type"] == "function"

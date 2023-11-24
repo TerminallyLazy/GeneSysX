@@ -12,17 +12,23 @@ class ResearchAssistant:
         self.client = OpenAI(api_key=api_key)
         self.model = model
 
-    def create_assistant_and_run(self, user_input, assistant_name, instructions, tools_list, thread_instructions, file_path=None):
+    def create_assistant(self, assistant_name, instructions, tools_list):
         assistant = self.client.beta.assistants.create(
             name=assistant_name,
             instructions=instructions,
             tools=tools_list,
             model=self.model
         )
+        return assistant
+
+    def initialize_thread(self):
         thread = self.client.beta.threads.create()
-        self.client.beta.threads.messages.create(thread_id=thread.id, role="user", content=user_input)
-        run = self.client.beta.threads.runs.create(thread_id=thread.id, assistant_id=assistant.id, instructions=thread_instructions)
-        self.check_run_status(thread.id, run.id)
+        return thread
+
+    def run_assistant(self, thread_id, assistant_id, user_input, thread_instructions):
+        self.client.beta.threads.messages.create(thread_id=thread_id, role="user", content=user_input)
+        run = self.client.beta.threads.runs.create(thread_id=thread_id, assistant_id=assistant_id, instructions=thread_instructions)
+        self.check_run_status(thread_id, run.id)
 
     def check_run_status(self, thread_id, run_id):
         while True:

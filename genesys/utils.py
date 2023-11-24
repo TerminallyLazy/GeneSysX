@@ -43,12 +43,15 @@ def gen_function_schema(func: Callable[..., Any]) -> dict[str, Any]:
     props = {}
     required = []
 
+    # get information about each param
     for name, param in inspect.signature(func).parameters.items():
         props[name] = {}
 
         if param.default is not param.empty:
+            # add default value information
             props[name]["default"] = param.default
         else:
+            # params without default values are considered "required"
             required.append(name)
 
         type_hint = param.annotation

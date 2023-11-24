@@ -83,3 +83,14 @@ def test_gen_tools_schema():
     
     for tool in schema:
         assert tool["type"] == "function"
+
+def test_gen_sequence_tools_schema():
+    import json
+    from genesys.tools import sequence
+
+    schema = utils.gen_tools_schema(sequence)
+    print(json.dumps(schema, indent=2))
+    assert isinstance(schema, list)
+
+    for tool in schema:
+        assert tool["type"] == "function"

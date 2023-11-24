@@ -1,36 +1,19 @@
-from typing import Annotated
-from typing_extensions import Doc
 import requests
 import xml.etree.ElementTree as ET
 
 base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 
-
-def _parse_search_results(
-    search_result: Annotated[
-        str,
-        Doc("Represents raw XML data in a string format")
-    ]
-) -> list[str]:
+def _parse_search_results(search_result: str) -> list[str]:
     """
     Parses the XML response from PubMed's ESearch API and returns a list of PMIDs.
     """
     root = ET.fromstring(search_result)
     return [id_tag.text for id_tag in root.findall('.//IdList/Id')]
 
-
-def fetch_papers(
-    query: Annotated[
-        str,
-        Doc("A string of search terms that best match the user's query")
-    ],
-    max_results: Annotated[
-        int,
-        Doc("Maximum number of papers returned")
-    ] = 10
-) -> list:
+def fetch_papers(query: str, max_results: int = 10) -> list:
     """
     Fetches a list of papers from PubMed based on the given query.
+    This function now also returns the abstract of each paper.
     """
 
     search_url = f"{base_url}esearch.fcgi?db=pubmed&term={query}&retmode=xml"
@@ -46,6 +29,9 @@ def fetch_papers(
     for article in root.findall('.//PubmedArticle'):
         pmid = article.find('.//PMID').text
         title = article.find('.//ArticleTitle').text
-        papers.append((pmid, title))
+
+        abstract = article.find('.//Abstract/AbstractText')
+        abstract_text = abstract.text if abstract is not None else "No abstract available"
+        papers.append((pmid, title, abstract_text))
 
     return papers

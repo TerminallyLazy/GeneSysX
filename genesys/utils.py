@@ -61,12 +61,14 @@ def gen_function_schema(func: Callable[..., Any]) -> dict[str, Any]:
 
     schema = {
         "name": func.__name__,
-        "description": inspect.getdoc(func),
         "parameters": {
             "type": "object",
             "properties": props,
         }
     }
+
+    if (desc := inspect.getdoc(func)) is not None:
+        schema["description"] = desc
 
     if len(required) > 0:
         schema["parameters"]["required"] = required

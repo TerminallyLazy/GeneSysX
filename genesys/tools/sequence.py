@@ -14,11 +14,7 @@ from Bio.SeqUtils.ProtParam import molecular_weight
 
 
 def sequence_type(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
-    """ Determine the type of sequence in a FASTA file.
-
-    Args:
-        filepath (str): Path to the FASTA file.
-    """
+    """Determine the type of sequence in a FASTA file."""
     try:
         with open(filepath, "r") as f:
             first = list(SeqIO.parse(f, "fasta"))[0]
@@ -35,11 +31,8 @@ def sequence_type(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
         return f"File not found: {filepath}"
 
 
-def count_occurences(filepath):
-    """ Count the number of nucleotides for each DNA/RNA sequence or amino acids for each protein in a FASTA file.
-
-    Args:
-        filepath (str): Path to the FASTA file.
+def count_occurences(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
+    """Count the number of nucleotides for each DNA/RNA sequence or amino acids for each protein in a FASTA file.
 
     Returns:
         dict: Dictionary with sequence IDs as keys and a Counter object as number of occurences.
@@ -61,7 +54,7 @@ def count_occurences(filepath):
 # Gives the complementary DNA sequence to a given DNA seq
 
 
-def transcription(filepath):
+def transcription(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
 
     if sequence_type(filepath) == "RNA":
         raise ValueError("The sequence is already RNA")
@@ -81,7 +74,7 @@ def transcription(filepath):
 # Transcripts a given DNA sequence (gives the RNA version)
 
 
-def complementary(filepath):
+def complementary(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     """
     Find the complementary DNA sequence to a given DNA sequence.
 
@@ -110,7 +103,7 @@ def complementary(filepath):
 
 # Gives the reverse complementary DNA sequence to a given DNA seq
 
-def reverseComplementary(filepath):
+def reverseComplementary(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
 
     if sequence_type == "DNA" or "RNA":
         reverseSeq = complementary(filepath)
@@ -125,7 +118,7 @@ def reverseComplementary(filepath):
 # The combined above two functions into one GC content calculator
 
 
-def gc_content(filepath):
+def gc_content(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
 
     sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
     gc_contents = {}
@@ -141,7 +134,7 @@ def gc_content(filepath):
     return gc_contents
 
 
-def translation(filepath):
+def translation(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     """
     Translate a DNA sequence to its protein sequence.
 
@@ -172,7 +165,7 @@ def translation(filepath):
     return translated_sequences
 
 
-def find_invalid_amino_acid(sequence):
+def find_invalid_amino_acid(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     invalid_positions = []
     for i, aa in enumerate(sequence):
         if aa not in "ACDEFGHIKLMNPQRSTVWY":
@@ -180,7 +173,7 @@ def find_invalid_amino_acid(sequence):
     return invalid_positions
 
 
-def mass_calculator(filepath):
+def mass_calculator(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     """
     Calculate the mass of a DNA, RNA, or protein sequence.
 
@@ -215,7 +208,7 @@ def mass_calculator(filepath):
 
 # TO DO : revist this function
 
-def open_reading_frames(filepath):
+def open_reading_frames(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     """
     Find and translate all open reading frames (ORFs) in a DNA sequence.
 
@@ -298,7 +291,7 @@ def find_recognition_sites(dna_sequence, enzyme_name):
     return recognition_sites
 
 
-def restriction_sites(filepath):
+def restriction_sites(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     enzyme_names = ["EcoRI", "HindIII", "BamHI", "XhoI",
                     "NotI", "SalI", "EcoRV", "PstI", "KpnI", "SmaI"]
 
@@ -320,7 +313,7 @@ def restriction_sites(filepath):
 
     return result
 
-def isoelectric_point(filepath):
+def isoelectric_point(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
 
     sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
     isoelectric_points = {}
@@ -338,7 +331,7 @@ def isoelectric_point(filepath):
         
     return isoelectric_points
 
-def multiple_sequence_alignment(filepath):
+def multiple_sequence_alignment(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     """
     Perform multiple sequence alignment on a FASTA file.
 
@@ -365,7 +358,7 @@ def multiple_sequence_alignment(filepath):
 # REVISIT THIS FUNCTION WITH CHARLIE
 
 
-def detect_snps(filepath):
+def detect_snps(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     """
     Detect singular nucleotide polymorphisms (SNPs) between multiple DNA sequences in a FASTA file.
 
@@ -397,7 +390,11 @@ def detect_snps(filepath):
 
     return snps
 
-def find_motifs(filepath, motif):
+def find_motifs(
+    filepath: Annotated[str, Doc("Path to the FASTA file.")],
+    motif: Annotated[str, Doc("Motif to search for.")]
+):
+    """Find the given motif in the sequences in the FASTA files."""
     motif_positions = {}
 
     for record in SeqIO.parse(filepath, "fasta"):

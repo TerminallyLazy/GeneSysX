@@ -8,7 +8,7 @@ def _parse_search_results(search_result: str) -> list[str]:
     Parses the XML response from PubMed's ESearch API and returns a list of PMIDs.
     """
     root = ET.fromstring(search_result)
-    return [id_tag.text for id_tag in root.findall('.//IdList/Id')]
+    return [id_tag.text for id_tag in root.findall('.//IdList/Id') if id_tag.text is not None]
 
 def fetch_papers(query: str, max_results: int = 10) -> list:
     """
@@ -27,8 +27,8 @@ def fetch_papers(query: str, max_results: int = 10) -> list:
 
     papers = []
     for article in root.findall('.//PubmedArticle'):
-        pmid = article.find('.//PMID').text
-        title = article.find('.//ArticleTitle').text
+        pmid = article.find('.//PMID')
+        title = article.find('.//ArticleTitle')
 
         abstract = article.find('.//Abstract/AbstractText')
         abstract_text = abstract.text if abstract is not None else "No abstract available"

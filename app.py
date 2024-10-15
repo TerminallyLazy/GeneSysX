@@ -160,15 +160,16 @@ if data_type == "FASTA":
             temp_file_path = os.path.join(temp_dir, filename)
             logging.info("Opening File path")
             with open(temp_file_path, "wb") as temp_file:
-                fasta_content = fasta_file.read()
-                temp_file.write(fasta_content)
+                        fasta_content = fasta_file.read()
+                        temp_file.write(fasta_content)
 
-                cli.upload_s3(fasta_content, username, filename, "FASTA")    
-                
+                        fasta_content_str = fasta_content.decode('utf-8')
+
+            cli.upload_s3(fasta_content_str, username, filename, "FASTA")    
 
             st.success(f"File uploaded successfully!")
 
-    if fasta_file is not None:
+if fasta_file is not None:
 
         # url = get_s3_url(filename=fasta_file.name)
         # upload_content_to_s3(url, fasta_content)
@@ -294,26 +295,31 @@ elif data_type == "CSV":
 
         df = pd.read_csv(csv_file)
         csv_filename = str(int(time()))+csv_file.name
-        cli.upload_s3(df.to_csv(StringIO()), username, csv_filename, "csv")
+        csv_buffer = StringIO()
+        df.to_csv(csv_buffer)
+        cli.upload_s3(csv_buffer.getvalue(), username, csv_filename, "csv")
         # ec.create_csv_event(username, cur_session, csv_filename, df)
-        
+
         st.dataframe(df)
         # ec.display_csv_event(username, cur_session, csv_filename)
 
-        llm = OpenAI(api_token=os.getenv("OPEN_API_KEY"))
-        sdf = SmartDataframe(df, config={"llm": llm})
 
-        csv_user_input = st.chat_input("")
-        # # ec.create_message_event(username, cur_session, csv_user_input)
+    from pandasai.schemas.df_config import Config
 
-        col1, col2 = st.columns(2)
+    default_config = Config()
+    sdf = SmartDataframe(df, config=default_config)
 
-        with col1:
-            shape_button = st.button("What is the shape of the dataframe?")
-            columns_button = st.button("What are the columns of the dataframe?")
-        with col2:
-            describe_button = st.button("Tell me the descriptive statistics")
-            head_button = st.button("Show the first 5 rows of the dataframe")
+    csv_user_input = st.chat_input("")
+
+    col1, col2 = st.columns(2)
+
+
+    with col1:
+        shape_button = st.button("What is the shape of the dataframe?")
+        columns_button = st.button("What are the columns of the dataframe?")
+    with col2:
+        describe_button = st.button("Tell me the descriptive statistics")
+        head_button = st.button("Show the first 5 rows of the dataframe")
 
         # TODO: These if statements can be simplified so much. I don't think the buttons should be generated in this app. The app file should be a simple loop of user event --> compute event. This architecture is un
         if shape_button:

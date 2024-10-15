@@ -39,11 +39,19 @@ class ResearchAssistant:
                 messages = self.client.beta.threads.messages.list(thread_id=thread_id)
                 for msg in messages.data:
                     role = msg.role
-                    content = msg.content[0].text.value
-                    print(f"{role.capitalize()}: {content}")
+                    for content_item in msg.content:
+                        if content_item.type == 'text':
+                            print(f"{role.capitalize()}: {content_item.text.value}")
+                        elif content_item.type == 'image_file':
+                            print(f"{role.capitalize()}: [Image File: {content_item.image_file.file_id}]")
+                        elif content_item.type == 'image_url':
+                            print(f"{role.capitalize()}: [Image URL: {content_item.image_url.url}]")
                 break
             elif run_status.status == 'requires_action':
-                self.process_required_actions(thread_id, run_id, run_status.required_action.submit_tool_outputs.model_dump())
+                if run_status.required_action and run_status.required_action.submit_tool_outputs:
+                    self.process_required_actions(thread_id, run_id, run_status.required_action.submit_tool_outputs.model_dump())
+                else:
+                    print("Required action is present, but submit_tool_outputs is not available.")
             else:
                 print("Waiting for the Assistant to process...")
         

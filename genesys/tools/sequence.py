@@ -167,9 +167,12 @@ def translation(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
 
 def find_invalid_amino_acid(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     invalid_positions = []
-    for i, aa in enumerate(sequence):
-        if aa not in "ACDEFGHIKLMNPQRSTVWY":
-            invalid_positions.append((aa, i))
+    sequences = SeqIO.to_dict(SeqIO.parse(filepath, "fasta"))
+    for seq_id, seq_record in sequences.items():
+        sequence = str(seq_record.seq)
+        for i, aa in enumerate(sequence):
+            if aa not in "ACDEFGHIKLMNPQRSTVWY":
+                invalid_positions.append((seq_id, aa, i))
     return invalid_positions
 
 

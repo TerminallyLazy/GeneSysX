@@ -244,36 +244,58 @@ def run_conversation(user_input, fasta_file):
             "content": f"""
                 {user_input}
 
-                '{fasta_file}' 
-            """
-        } # TODO: Are we giving chat gpt the entire fasta content? We should review and rethink this strategy. We are going to get a ton of out of token errors. 
-        # TODO: If we are married to this we atleast need to incorporate a token estimator to catch this error before it happens and figure out a chunking strategy.
+                '{fasta_file}'
+                """
+        }
     ]
 
-    # TODO: extract chat completion options
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-0613",
-        messages=messages,
-        functions=functions,
-        function_call="auto",  # The model decides whether to call a function,
-        temperature=0.3, # Note: Good temperature choice.
-    )
+from openai import OpenAI
 
-    response_message = response["choices"][0]["message"]
+client = OpenAI()
+
+def create_chat_completion(user_input):
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_input}
+        ],
+        # functions=functions,
+        function_call="auto",  # The model decides whether to call a function
+        temperature=0.3,
+    )
+    return response
+#     temperature=0.3,
+# )
+
+# def create_chat_completion(user_input):
+#     response = client.chat.completions.create(
+#         model="gpt-4o",
+#         messages=[
+#             {"role": "system", "content": system_prompt},
+#             {"role": "user", "content": user_input}
+#         ],
+#         #functions=functions,
+#         function_call="auto",  # The model decides whether to call a function
+#         temperature=0.3,
+#     )
+    #return response
+
+    response_message = response.choices[0].message
     # ec.create_response_event(username, current_session, response_message)
 
     # Initialize function_response with a default value
     function_response = None
 
     # Step 2: Check if GPT wants to call a function
-    if response_message.get("function_call"):
+    if response_message.function_call:
         # Step 3: Call the function based on the model's response
-        function_name = response_message["function_call"]["name"]
+        function_name = response_message.function_call.name
 
         if function_name is not None:
             try:
                 function_to_call = getattr(toolkit, function_name)
-                function_args = json.loads(response_message["function_call"]["arguments"])
+                function_args = json.loads(response_message.function_call.arguments)
                 filepath = function_args.get("filepath")
                 motif = function_args.get("motif", None)
 
@@ -285,9 +307,10 @@ def run_conversation(user_input, fasta_file):
             except json.JSONDecodeError:
                 function_response = "An error occurred while decoding the function arguments."
     
-    # ec.create_response_event(username, current_session, function_response)
     # Step 4: Extend the conversation with the function call and response
     # Extend the conversation with the assistant's reply
+    if 'messages' not in locals():
+        messages = []
     messages.append(response_message)
     if function_response is not None:
         messages.append(
@@ -299,12 +322,12 @@ def run_conversation(user_input, fasta_file):
         )  # Extend the conversation with the function response
 
     # Step 5: Send the extended conversation to GPT for further interaction
-    second_response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-0613",
+    second_response = openai.chat.completions.create(
+        model="gpt-4o",
         messages=messages,
     )
 
-    answer = second_response["choices"][0]["message"]["content"]
+    answer = second_response.choices[0].message.content
     # ec.create_response_event(username, current_session, answer)
 
     return answer

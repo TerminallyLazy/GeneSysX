@@ -2,6 +2,9 @@
 import json
 from time import time
 import logging
+import os
+from typing import Dict
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 # External Python Modules
@@ -251,17 +254,17 @@ def update_session(user_id:str, updated_session:dict):
     session_id = updated_session['sessionId']
 
     json_list = get_session_group(user_id)
-    old_session = get_session_dict(user_id, session_id, json_list)
+    old_session = get_session_dict(session_id, json_list)
     json_list.remove(old_session)
-    
     json_list.append(updated_session)
     json_data = json.dumps(json_list)
     client.upload_s3(content=json_data, user_id=user_id, data_file=session_group)
 
-def get_session_dict(user_id:str, session_id:str, json_list:list) -> dict:
+def get_session_dict(session_id:str, json_list:list) -> dict:
     for sesh in json_list:
         if sesh['sessionId'] == session_id:
             return sesh
+    return {}  # Return an empty dictionary if no matching session is found
         
 def get_session_group(user_id:str) -> list:
     session_group = "session-group"

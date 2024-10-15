@@ -13,7 +13,7 @@ def _lenient_issubclass(cls: Any, class_or_tuple: Any) -> bool:
     try:
         return isinstance(cls, type) and issubclass(cls, class_or_tuple)
     except TypeError:
-        if isinstance(cls, (typing._GenericAlias, GenericAlias, UnionType)):
+        if isinstance(cls, (GenericAlias, UnionType)):
             return False
         else:
             raise
@@ -55,7 +55,7 @@ def gen_function_schema(func: Callable[..., Any]) -> dict[str, Any]:
             required.append(name)
 
         type_hint = param.annotation
-        props[name]["type"] = to_json_type(typing._strip_annotations(type_hint))
+        props[name]["type"] = to_json_type(type_hint)
 
         if is_annotated(type_hint):
             for metadata in type_hint.__metadata__:

@@ -6,9 +6,9 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 # TODO: Generate the random a
 
 
-def upload_content_to_s3(presigned_url:str, content:str) -> int:
+def upload_content_to_s3(presigned_url: str, content: str) -> int:
     with requests.Client(timeout=60) as client:
-        http_response = client.put(presigned_url, data=content)
+        http_response = client.put(presigned_url, content=content)
 
     if http_response.status_code == 200:
         logging.info("Successfully uploaded content to S3")
@@ -82,5 +82,6 @@ if __name__ == "__main__":
     upload_content_to_s3(get_s3_upload_url(user_id="Charlie-Test"), "abcde")
 
     logging.info("Doing a Download")
-    download_content_from_s3(get_s3_download_url(user_id="Charlie-Test"))
+    download_url, *_ = get_s3_download_url(user_id="Charlie-Test")
+    download_content_from_s3(download_url)
     # download_content_from_s3()

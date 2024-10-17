@@ -2,6 +2,49 @@
 
 GeneSys AI is an innovative and versatile tool designed to empower bioinformaticians, researchers, clinicians, and students in their genomics and bioinformatics endeavors. This chatbot harnesses the power of GPT (Generative Pre-trained Transformer) technology to provide a user-friendly, conversational interface for a wide range of genomic analysis tasks.
 
+## Installation and Usage
+
+### Prerequisites
+
+- Python 3.10 or higher
+- pip (Python package installer)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/TerminallyLazy/GeneSysX.git
+   cd GeneSysX
+   ```
+
+2. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Set up the environment variables:
+   - Create a `.env` file in the root directory.
+   - Add your OpenAI API key to the `.env` file:
+     ```
+     OPENAI_API_KEY=your_api_key_here
+     ```
+
+### Running the Gradio App
+
+1. Launch the Gradio app:
+   ```bash
+   python app.py
+   ```
+
+2. Access the app in your web browser using the provided Gradio link.
+
+### Quick Guide
+
+1. 📤 Upload a file (FASTA, CSV, or PDB).
+2. 🔍 Click 'Process File' to analyze.
+3. ❓ Ask a question about the data.
+4. 🧬 For PDB files, check the Protein Visualization tab.
+
 ## Key Features:
 
 FASTA File Processing: Users can easily upload FASTA files containing DNA or protein sequences for various analytical tasks.

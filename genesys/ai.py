@@ -1,6 +1,7 @@
 import os
 import json
 import openai
+from openai import OpenAI
 from . import eventcreator as ec
 from . import DNAToolKit as toolkit
 from .env import load_dotenv
@@ -233,7 +234,33 @@ functions = [
 ]
 
 def run_conversation(user_input, fasta_file):
-    # Step 1: Send the user query and available functions to GPT-3.5 Turbo
+    import logging
+    import os
+    from io import StringIO
+    logging.basicConfig(level=logging.DEBUG)
+    logging.debug(f"Starting run_conversation with user_input: {user_input}, fasta_file: {fasta_file}")
+
+    # Check if fasta_file is a StringIO object or a file path
+    if isinstance(fasta_file, StringIO):
+        content = fasta_file.getvalue()[:100]
+        filepath = "memory_file.fasta"  # Placeholder name for StringIO objects
+        logging.debug(f"First 100 characters of StringIO content: {content}")
+    elif os.path.exists(fasta_file):
+        try:
+            with open(fasta_file, 'r') as f:
+                content = f.read(100)
+                logging.debug(f"First 100 characters of file content: {content}")
+            filepath = fasta_file
+        except IOError as e:
+            logging.error(f"Error reading file: {str(e)}")
+            return f"An error occurred: {str(e)}"
+    else:
+        logging.error(f"File does not exist: {fasta_file}")
+        return "Error: File does not exist"
+
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    # Step 1: Send the user query and available functions to GPT-4
     messages = [
         {
             "role": "system",
@@ -244,90 +271,83 @@ def run_conversation(user_input, fasta_file):
             "content": f"""
                 {user_input}
 
-                '{fasta_file}'
+                '{filepath}'
                 """
         }
     ]
 
-from openai import OpenAI
+    try:
+        # Step 2: Get the initial response from GPT-4
+        logging.info("Sending initial request to GPT-4")
+        response = client.chat.completions.create(
+            model="gpt-4",  # Use the correct model name
+            messages=messages,
+            functions=functions,
+            function_call="auto",
+            temperature=0.3,
+        )
+        logging.debug(f"Received initial response: {response}")
 
-client = OpenAI()
+        response_message = response.choices[0].message
+        logging.info(f"Response message: {response_message}")
 
-def create_chat_completion(user_input):
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_input}
-        ],
-        # functions=functions,
-        function_call="auto",  # The model decides whether to call a function
-        temperature=0.3,
-    )
-    return response
-#     temperature=0.3,
-# )
+        # Step 3: Check if GPT wants to call a function
+        if response_message.function_call:
+            function_name = response_message.function_call.name
+            logging.info(f"GPT wants to call function: {function_name}")
 
-# def create_chat_completion(user_input):
-#     response = client.chat.completions.create(
-#         model="gpt-4o",
-#         messages=[
-#             {"role": "system", "content": system_prompt},
-#             {"role": "user", "content": user_input}
-#         ],
-#         #functions=functions,
-#         function_call="auto",  # The model decides whether to call a function
-#         temperature=0.3,
-#     )
-    #return response
+            if function_name is not None:
+                try:
+                    function_to_call = getattr(toolkit, function_name)
+                    function_args = json.loads(response_message.function_call.arguments)
+                    motif = function_args.get("motif", None)
+                    logging.info(f"Calling function {function_name} with filepath: {filepath}, motif: {motif}")
 
-    response_message = response.choices[0].message
-    # ec.create_response_event(username, current_session, response_message)
+                    if isinstance(fasta_file, StringIO):
+                        if function_name == "find_motifs":
+                            function_response = function_to_call(filepath=fasta_file.getvalue(), motif=motif)
+                        else:
+                            function_response = function_to_call(filepath=fasta_file.getvalue())
+                    else:
+                        if function_name == "find_motifs":
+                            function_response = function_to_call(filepath=filepath, motif=motif)
+                        else:
+                            function_response = function_to_call(filepath=filepath)
+                    logging.debug(f"Function response: {function_response}")
 
-    # Initialize function_response with a default value
-    function_response = None
+                    # Step 4: Extend the conversation with the function call and response
+                    messages.append(response_message)
+                    messages.append(
+                        {
+                            "role": "function",
+                            "name": function_name,
+                            "content": str(function_response),
+                        }
+                    )
 
-    # Step 2: Check if GPT wants to call a function
-    if response_message.function_call:
-        # Step 3: Call the function based on the model's response
-        function_name = response_message.function_call.name
+                except (json.JSONDecodeError, AttributeError) as e:
+                    logging.error(f"Error calling function: {str(e)}")
+                    function_response = f"An error occurred: {str(e)}"
+                    messages.append(
+                        {
+                            "role": "function",
+                            "name": "error",
+                            "content": function_response,
+                        }
+                    )
 
-        if function_name is not None:
-            try:
-                function_to_call = getattr(toolkit, function_name)
-                function_args = json.loads(response_message.function_call.arguments)
-                filepath = function_args.get("filepath")
-                motif = function_args.get("motif", None)
+        # Step 5: Send the extended conversation to GPT for further interaction
+        logging.info("Sending second request to GPT-4")
+        second_response = client.chat.completions.create(
+            model="gpt-4",
+            messages=messages,
+        )
+        logging.debug(f"Received second response: {second_response}")
 
-                if function_name == "find_motifs":
-                    function_response = function_to_call(filepath=filepath, motif=motif)
-                else:
-                    function_response = function_to_call(filepath=filepath) 
+        answer = second_response.choices[0].message.content
+        logging.info(f"Final answer: {answer}")
+        return answer
 
-            except json.JSONDecodeError:
-                function_response = "An error occurred while decoding the function arguments."
-    
-    # Step 4: Extend the conversation with the function call and response
-    # Extend the conversation with the assistant's reply
-    if 'messages' not in locals():
-        messages = []
-    messages.append(response_message)
-    if function_response is not None:
-        messages.append(
-            {
-                "role": "function",
-                "name": function_name,
-                "content": str(function_response),
-            }
-        )  # Extend the conversation with the function response
-
-    # Step 5: Send the extended conversation to GPT for further interaction
-    second_response = openai.chat.completions.create(
-        model="gpt-4o",
-        messages=messages,
-    )
-
-    answer = second_response.choices[0].message.content
-    # ec.create_response_event(username, current_session, answer)
-
-    return answer
+    except Exception as e:
+        logging.error(f"An error occurred in run_conversation: {str(e)}", exc_info=True)
+        return f"An error occurred: {str(e)}"

@@ -1,3 +1,2 @@
-import streamlit as st
+import gradio as gr
 import py3Dmol
-from stmol import showmol

@@ -1,5 +1,7 @@
 import collections
 import re
+import tempfile
+import os
 
 from typing import Annotated
 from typing_extensions import Doc
@@ -334,6 +336,10 @@ def isoelectric_point(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
         
     return isoelectric_points
 
+import tempfile
+import os
+from Bio import SeqIO
+
 def multiple_sequence_alignment(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
     """
     Perform multiple sequence alignment on a FASTA file.
@@ -342,21 +348,38 @@ def multiple_sequence_alignment(filepath: Annotated[str, Doc("Path to the FASTA 
     - filepath: Path to the FASTA file containing the sequences to align.
 
     Returns:
-    - A MultipleSeqAlignment object containing the aligned sequences.
+    - A string containing the aligned sequences in FASTA format.
     """
-    with open(filepath, "r") as text_file:
-        alignment = AlignIO.read(text_file, "fasta")
+    try:
+        # Read sequences from the input file
+        sequences = list(SeqIO.parse(filepath, "fasta"))
 
-    aligned_seqs = []
+        # Generate unique, short identifiers for each sequence
+        for i, seq in enumerate(sequences):
+            seq.id = f"seq_{i+1}"
+            seq.description = ""
 
-    for record in alignment:
-        if sequence_type(filepath) == "Protein":
-            aligned_seqs.append(record)
-        elif sequence_type(filepath) == "DNA":
-            aligned_seqs.append(SeqRecord(record.seq.translate(), id=record.id))
-            
+        # Write sequences to a temporary file with short identifiers
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.fasta') as temp_file:
+            SeqIO.write(sequences, temp_file, "fasta")
+            temp_file_path = temp_file.name
 
-    return MultipleSeqAlignment(aligned_seqs)
+        # Perform multiple sequence alignment using the temporary file
+        with open(temp_file_path, "r") as text_file:
+            alignment = AlignIO.read(text_file, "fasta")
+
+        # Convert the alignment to a string in FASTA format manually
+        alignment_str = ""
+        for record in alignment:
+            alignment_str += f">{record.id}\n{str(record.seq)}\n"
+
+        # Clean up the temporary file
+        os.unlink(temp_file_path)
+
+        return alignment_str
+
+    except Exception as e:
+        return f"An error occurred during multiple sequence alignment: {str(e)}"
 
 # REVISIT THIS FUNCTION WITH CHARLIE
 

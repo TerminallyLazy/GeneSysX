@@ -1,6 +1,5 @@
 import os
-import streamlit as st
-from dotenv import load_dotenv as _load_dotenv
+from dotenv import load_dotenv as _load_dotenv, dotenv_values
 
 def load_dotenv():
     """This will load environment variables from `.env`.
@@ -9,7 +8,7 @@ def load_dotenv():
 
     After calling this function, you can reference the values in the `.env`
     file using `os.environ` and `os.getenv` as if they came from the actual
-    environment. 
+    environment.
 
     References:
     - https://github.com/gventuri/pandas-ai/blob/main/pandasai/helpers/env.py
@@ -17,7 +16,12 @@ def load_dotenv():
     try:
         _load_dotenv()
         if os.getenv("OPENAI_API_KEY") is None:
-            os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+            # Try to get the API key from the .env file
+            env_values = dotenv_values()
+            if "OPENAI_API_KEY" in env_values:
+                os.environ["OPENAI_API_KEY"] = env_values["OPENAI_API_KEY"]
+            else:
+                print("Warning: OPENAI_API_KEY not found in environment or .env file")
     except ValueError:
         pass
 
@@ -38,4 +42,6 @@ def values():
         A dictionary containing values parsed and validated from the `.env`
         file and from the environment.
     """
-    pass
+    env_values = dotenv_values()
+    env_values.update({key: value for key, value in os.environ.items() if key in env_values})
+    return env_values

@@ -1,12 +1,12 @@
 import logging
 logging.basicConfig(level=logging.INFO)
-import streamlit as st
-from stmol import showmol
+import gradio as gr
 import py3Dmol
 from . import DNAToolKit
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from Bio import Phylo
 import matplotlib.pyplot as plt
+import io
 
 def count_clades(tree):
     terminals = tree.get_terminals()
@@ -33,7 +33,6 @@ def construct_phylogenetic_tree(filepath):
     constructor = DistanceTreeConstructor(calculator)
     tree = constructor.build_tree(aligned_seqs)
 
-
     if count_clades(tree) <= 25:
         fig, ax = plt.subplots(figsize=(100, 50))
     elif 25 < count_clades(tree) <= 50:
@@ -43,26 +42,20 @@ def construct_phylogenetic_tree(filepath):
 
     Phylo.draw(tree, axes=ax)
 
-    fig.savefig("phylogenetic_tree.png")
+    img_buf = io.BytesIO()
+    fig.savefig(img_buf, format='png')
+    img_buf.seek(0)
 
+    return tree, img_buf
 
-    return tree
-
-
-def render_protein_file(pdb_file_content):
+def render_protein_file(pdb_file_content, style, bcolor, spin):
     pdbview = py3Dmol.view(width=400, height=400)
     pdbview.addModel(pdb_file_content, 'pdb')
-    bcolor = st.sidebar.color_picker('Pick A Background Color', '#FFFFFF')
-    style = st.sidebar.selectbox('style',['cartoon','line','cross','stick','sphere'])
-    spin = st.sidebar.checkbox('Spin', value = True)
     pdbview.setStyle({style:{'color':'spectrum'}})
     pdbview.setBackgroundColor(bcolor)
-    if spin:
-        pdbview.spin(True)
-    else:
-        pdbview.spin(False)
+    pdbview.spin(spin)
     pdbview.zoomTo()
-    showmol(pdbview,height=500,width=800)
+    return pdbview.render()
 
 def render_mol(xyz):
     xyzview = py3Dmol.view(width=400,height=400)
@@ -70,4 +63,39 @@ def render_mol(xyz):
     xyzview.setStyle({'stick':{}})
     xyzview.setBackgroundColor('white')#('0xeeeeee')
     xyzview.zoomTo()
-    showmol(xyzview, height = 500,width=800)
+    return xyzview.render()
+
+def create_visuals_interface():
+    with gr.Blocks() as interface:
+        gr.Markdown("# Protein and Molecule Visualization")
+
+        with gr.Tab("Protein Visualization"):
+            pdb_input = gr.File(label="Upload PDB file")
+            style_input = gr.Dropdown(choices=['cartoon','line','cross','stick','sphere'], label="Style", value='cartoon')
+            color_input = gr.ColorPicker(label="Background Color", value='#FFFFFF')
+            spin_input = gr.Checkbox(label="Spin", value=True)
+            protein_output = gr.HTML(label="Protein Visualization")
+            render_protein_button = gr.Button("Render Protein")
+            render_protein_button.click(
+                lambda file, style, color, spin: render_protein_file(file.read().decode("utf-8"), style, color, spin),
+                inputs=[pdb_input, style_input, color_input, spin_input],
+                outputs=[protein_output]
+            )
+
+        with gr.Tab("Molecule Visualization"):
+            xyz_input = gr.Textbox(label="Enter XYZ coordinates")
+            mol_output = gr.HTML(label="Molecule Visualization")
+            render_mol_button = gr.Button("Render Molecule")
+            render_mol_button.click(render_mol, inputs=[xyz_input], outputs=[mol_output])
+
+        with gr.Tab("Phylogenetic Tree"):
+            fasta_input = gr.File(label="Upload FASTA file")
+            tree_output = gr.Image(label="Phylogenetic Tree")
+            construct_tree_button = gr.Button("Construct Phylogenetic Tree")
+            construct_tree_button.click(
+                lambda file: construct_phylogenetic_tree(file.name)[1],
+                inputs=[fasta_input],
+                outputs=[tree_output]
+            )
+
+    return interface

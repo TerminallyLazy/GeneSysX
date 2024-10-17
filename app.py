@@ -36,30 +36,45 @@ def process_file(file):
         return f"An error occurred while processing the file: {str(e)}"
 
 def answer_question(question, file):
-    file_path = file.name
-    logging.debug(f"Answering question: '{question}' for file: {file_path}")
+    logging.debug(f"Answering question: '{question}' for file: {file}")
     try:
+        if isinstance(file, str):
+            file_path = file
+        elif hasattr(file, 'name'):
+            file_path = file.name
+        else:
+            file_path = None
+
         if question.lower().strip() == "what are the sequence ids in the uploaded fasta file?":
-            sequence_ids = toolkit.extract_sequence_ids(file_path)
+            sequence_ids = toolkit.extract_sequence_ids(file_path or file)
             answer = f"The sequence IDs in the uploaded FASTA file are: {', '.join(sequence_ids)}"
         else:
-            with open(file_path, 'r') as f:
-                file_content = f.read()
-            answer = run_conversation(question, StringIO(file_content))
+            if file_path:
+                with open(file_path, 'r') as f:
+                    file_content = f.read()
+            else:
+                file_content = file.read() if hasattr(file, 'read') else str(file)
+            answer = run_conversation(question, file_content)
         logging.debug(f"Answer received: {answer[:100]}...")  # Log first 100 characters of the answer
         return answer
     except Exception as e:
-        logging.error(f"Error in answer_question: {str(e)}")
-        return f"An error occurred: {str(e)}"
+        logging.error(f"Error in answer_question: {str(e)}", exc_info=True)
+        return f"An error occurred: {str(e)}. Please ensure you've uploaded a valid FASTA file."
 
 def create_interface():
     with gr.Blocks() as demo:
         gr.Markdown("# GeneSysX Gradio App")
         gr.Markdown("## Quick Start Guide")
-        gr.Markdown("1. 📤 Upload a file (FASTA, CSV, or PDB)")
-        gr.Markdown("2. 🔍 Click 'Process File' to analyze")
-        gr.Markdown("3. ❓ Ask a question about the data")
-        gr.Markdown("4. 🧬 For PDB files, check the Protein Visualization tab")
+        gr.Markdown("### Installation")
+        gr.Markdown("1. 📥 Clone the repo: `git clone https://github.com/TerminallyLazy/GeneSys-X.git`")
+        gr.Markdown("2. 📦 Install dependencies: `pip install -r requirements.txt`")
+        gr.Markdown("3. 🚀 Run the app: `python app.py`")
+        gr.Markdown("### Usage")
+        gr.Markdown("1. 📤 Upload a file (FASTA, CSV, or PDB) ➡️")
+        gr.Markdown("2. 🔍 Click 'Process File' to analyze ➡️")
+        gr.Markdown("3. ❓ Ask a question about the data ➡️")
+        gr.Markdown("4. 🧬 For PDB files, check the Protein Visualization tab ➡️")
+        gr.Markdown("Example: Upload a FASTA file, process it, then ask 'What are the sequence IDs in the uploaded FASTA file?'")
 
         with gr.Tab("File Processing"):
             file_input = gr.File(label="Upload File (FASTA, CSV, or PDB)")
@@ -74,7 +89,13 @@ def create_interface():
             answer_button.click(answer_question, inputs=[question_input, file_input], outputs=[answer_output])
 
         with gr.Tab("Protein Visualization"):
-            create_protein_interface()
+            try:
+                logging.info("Initializing Protein Visualization interface")
+                protein_interface = create_protein_interface()
+                logging.info("Protein Visualization interface initialized successfully")
+            except Exception as e:
+                logging.error(f"Error initializing Protein Visualization interface: {str(e)}")
+                gr.Markdown("An error occurred while loading the Protein Visualization interface. Please check the logs for more information.")
 
     return demo
 

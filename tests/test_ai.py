@@ -153,4 +153,5 @@ def test_find_motifs():
 @pytest.mark.skip(reason="used for manual testing")
 def test_run_conversation():
     filepath = os.path.join(TEST_DATA_DIR, "sequence.fasta")
-    print(ai.run_conversation("What type of sequences are in this file?", filepath))
+    result = ai.run_conversation("What type of sequences are in this file?", filepath, timeout=60)
+    print(result)

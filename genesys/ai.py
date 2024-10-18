@@ -233,7 +233,7 @@ functions = [
     }
 ]
 
-def run_conversation(question, file_path, timeout=30):
+def run_conversation(question, file_input, timeout=30):
     import logging
     import os
     from io import StringIO
@@ -242,11 +242,16 @@ def run_conversation(question, file_path, timeout=30):
     from openai import OpenAI
     from genesys import toolkit
     logging.basicConfig(level=logging.DEBUG)
-    logging.debug(f"Starting run_conversation with question: {question}, file_path: {file_path}")
+    logging.debug(f"Starting run_conversation with question: {question}, file_input: {file_input}")
 
     try:
-        with open(file_path, 'r') as file:
-            file_content = file.read()
+        if isinstance(file_input, str):
+            with open(file_input, 'r') as file:
+                file_content = file.read()
+        elif isinstance(file_input, StringIO):
+            file_content = file_input.getvalue()
+        else:
+            raise ValueError("Invalid file input type. Expected str or StringIO.")
 
         # Extract sequence IDs
         sequence_ids = [record.id for record in SeqIO.parse(StringIO(file_content), "fasta")]

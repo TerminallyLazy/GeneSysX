@@ -115,9 +115,15 @@ def find_motifs(filepath, motif):
             positions = [i for i in range(len(seq)) if seq.startswith(motif, i)]
             return positions
 
-def extract_sequence_ids(filepath):
+def extract_sequence_ids(file_input):
     sequence_ids = []
-    with open(filepath, 'r') as file:
-        for record in SeqIO.parse(file, 'fasta'):
+    try:
+        # Try to open as a file path
+        with open(file_input, 'r') as file:
+            for record in SeqIO.parse(file, 'fasta'):
+                sequence_ids.append(record.id)
+    except (TypeError, IOError):
+        # If not a file path, treat as StringIO object
+        for record in SeqIO.parse(file_input, 'fasta'):
             sequence_ids.append(record.id)
     return sequence_ids

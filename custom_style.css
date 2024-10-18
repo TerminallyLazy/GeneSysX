@@ -1,0 +1,103 @@
+/* Custom CSS for GeneSysX Gradio App */
+
+body {
+    background-color: #1E2130;
+    color: #E0E0E0;
+    font-family: sans-serif;
+}
+
+.container {
+    background-color: #2C3142;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.gradio-button {
+    background-color: #7B68EE;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.gradio-button:hover {
+    background-color: #6A5ACD;
+}
+
+.gradio-input {
+    background-color: #2C3142;
+    color: #E0E0E0;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.gradio-output {
+    background-color: #2C3142;
+    color: #E0E0E0;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.file-info {
+    color: #7B68EE;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.download-button {
+    background-color: transparent;
+    color: #7B68EE;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #7B68EE #1E2130;
+}
+
+.scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    background: #1E2130;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    background-color: #7B68EE;
+    border-radius: 4px;
+}
+
+/* Additional styles for better spacing and layout */
+.gradio-app {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.gradio-tab {
+    margin-top: 20px;
+}
+
+.gradio-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.gradio-column {
+    flex: 1;
+    margin-right: 15px;
+}
+
+.gradio-column:last-child {
+    margin-right: 0;
+}

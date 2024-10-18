@@ -2,8 +2,8 @@ import collections
 import re
 import tempfile
 import os
-
-from typing import Annotated
+from io import StringIO
+from typing import Annotated, Union
 from typing_extensions import Doc
 
 from Bio import AlignIO, Restriction, SeqIO
@@ -340,41 +340,51 @@ import tempfile
 import os
 from Bio import SeqIO
 
-def multiple_sequence_alignment(filepath: Annotated[str, Doc("Path to the FASTA file.")]):
+from Bio import Align
+
+def multiple_sequence_alignment(input_data: Union[str, StringIO]):
     """
-    Perform multiple sequence alignment on a FASTA file.
+    Perform multiple sequence alignment on a FASTA file or StringIO object.
 
     Parameters:
-    - filepath: Path to the FASTA file containing the sequences to align.
+    - input_data: Path to the FASTA file or StringIO object containing the sequences to align.
 
     Returns:
     - A string containing the aligned sequences in FASTA format.
     """
     try:
-        # Read sequences from the input file
-        sequences = list(SeqIO.parse(filepath, "fasta"))
+        # Read sequences from the input file or StringIO object
+        if isinstance(input_data, str):
+            sequences = list(SeqIO.parse(input_data, "fasta"))
+        else:
+            sequences = list(SeqIO.parse(input_data, "fasta"))
 
         # Generate unique, short identifiers for each sequence
         for i, seq in enumerate(sequences):
             seq.id = f"seq_{i+1}"
             seq.description = ""
 
-        # Write sequences to a temporary file with short identifiers
-        with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.fasta') as temp_file:
-            SeqIO.write(sequences, temp_file, "fasta")
-            temp_file_path = temp_file.name
+        # Create a PairwiseAligner object with global alignment mode
+        aligner = Align.PairwiseAligner()
+        aligner.mode = 'global'
 
-        # Perform multiple sequence alignment using the temporary file
-        with open(temp_file_path, "r") as text_file:
-            alignment = AlignIO.read(text_file, "fasta")
+        # Implement progressive alignment
+        aligned_sequences = [sequences[0]]
+        for seq in sequences[1:]:
+            # Align the current sequence with the consensus of already aligned sequences
+            consensus = Seq("".join([max(set(col), key=col.count) for col in zip(*[str(s.seq) for s in aligned_sequences])]))
+            alignment = aligner.align(consensus, seq.seq)
+            best_alignment = alignment[0]
 
-        # Convert the alignment to a string in FASTA format manually
+            # Update aligned sequences
+            for i, aligned_seq in enumerate(aligned_sequences):
+                aligned_sequences[i] = SeqRecord(Seq(best_alignment[0][:len(aligned_seq.seq)]), id=aligned_seq.id, description="")
+            aligned_sequences.append(SeqRecord(Seq(best_alignment[1]), id=seq.id, description=""))
+
+        # Convert the alignment to a string in FASTA format
         alignment_str = ""
-        for record in alignment:
+        for record in aligned_sequences:
             alignment_str += f">{record.id}\n{str(record.seq)}\n"
-
-        # Clean up the temporary file
-        os.unlink(temp_file_path)
 
         return alignment_str
 

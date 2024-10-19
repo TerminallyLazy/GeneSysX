@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 def verify_functionality():
     try:
-        client = gradio_client.Client('https://02910c43ac5541ad74.gradio.live')
+        client = gradio_client.Client('https://8c193e3683dbe85753.gradio.live')
         logger.info('Successfully connected to Gradio client')
 
         # View API
